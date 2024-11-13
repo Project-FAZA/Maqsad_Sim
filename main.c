@@ -20,6 +20,12 @@ typedef struct
     SDL_Color color; // Color of the bullet
 } Bullet;
 
+typedef struct
+{
+    int x, y;        // Position of the enemy
+    SDL_Color color; // Color of the enemy
+} Enemy;
+
 void initSDL(SDL_Window **window, SDL_Renderer **renderer)
 {
     // Initialize SDL
@@ -90,6 +96,7 @@ void shootBullet(Plane *plane, Bullet *bullets, int *bulletCount)
     }
 }
 
+// Boht mushkil ho rahi hai boss
 void renderPlane(SDL_Renderer *renderer, Plane *plane)
 {
     // Set the drawing color for the plane
@@ -102,8 +109,39 @@ void renderPlane(SDL_Renderer *renderer, Plane *plane)
     SDL_Rect wings = {plane->x - (75 / 2), plane->y + 40, 100, 20}; // Body is a horizontal rectangle
     SDL_RenderFillRect(renderer, &wings);
 
+    SDL_Rect wing_part1 = {plane->x - (75 / 2) + 20, plane->y + 35, 20, 20}; // Body is a horizontal rectangle
+    SDL_RenderFillRect(renderer, &wing_part1);
+
+    SDL_Rect wing_part2 = {plane->x - (75 / 2) + 60, plane->y + 35, 20, 20}; // Body is a horizontal rectangle
+    SDL_RenderFillRect(renderer, &wing_part2);
+
     SDL_Rect tail = {plane->x - (25 / 2), plane->y + 100, 50, 20}; // Body is a horizontal rectangle
     SDL_RenderFillRect(renderer, &tail);
+}
+
+void renderEnemy(SDL_Renderer *renderer, Enemy *enemy)
+{
+    SDL_SetRenderDrawColor(renderer, enemy->color.r, enemy->color.g, enemy->color.b, enemy->color.a);
+    SDL_Rect body = {enemy->x, enemy->y, 50, 50};
+    SDL_RenderFillRect(renderer, &body);
+}
+
+void checkCollision(Bullet bullets[], int bulletCount, Enemy *enemy)
+{
+    SDL_Rect body = {enemy->x, enemy->y, 50, 50};
+
+    for (int i = 0; i < bulletCount; i++)
+    {
+        SDL_Rect bulletRect = {bullets[i].x, bullets[i].y, bullets[i].w, bullets[i].h};
+
+        if (SDL_HasIntersection(&bulletRect, &body))
+        {
+            enemy->color.r = 255;
+            enemy->color.g = 255;
+            enemy->color.b = 255;
+            enemy->color.a = 255;
+        }
+    }
 }
 
 void handleInput(Plane *plane)
@@ -139,6 +177,9 @@ int main(int argc, char *argv[])
 
     // Create a plane object
     Plane plane = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}}; // Red plane
+    Enemy enemy = {0,
+                   0,
+                   {255, 255, 0, 255}};
 
     Bullet bullets[100]; // Array to hold up to 100 bullets
     int bulletCount = 0; // Keep track of the number of bullets
@@ -172,9 +213,11 @@ int main(int argc, char *argv[])
 
         // Render the plane
         renderPlane(renderer, &plane);
+        renderEnemy(renderer, &enemy);
 
         updateBullets(bullets, &bulletCount);
         renderBullets(renderer, bullets, &bulletCount);
+        checkCollision(bullets, bulletCount, &enemy);
 
         // Present the rendered frame
         SDL_RenderPresent(renderer);
