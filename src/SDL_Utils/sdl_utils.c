@@ -3,9 +3,15 @@
 void initSDL(SDL_Window **window, SDL_Renderer **renderer)
 {
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
     {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        exit(1);
+    }
+
+    if (IMG_Init(IMG_INIT_PNG) == 0)
+    {
+        printf("Error SDL2_image Initialization");
         exit(1);
     }
 

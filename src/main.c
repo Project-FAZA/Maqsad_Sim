@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include "SDL_Utils/sdl_utils.h"
 #include "Plane/plane.h"
@@ -9,12 +10,17 @@ int main(int argc, char *argv[])
 {
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
+    SDL_Texture *tex = NULL;
 
     // Initialize SDL and create the window and renderer
     initSDL(&window, &renderer);
 
     // Create a plane object
-    Plane plane = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}}; // Red plane
+    Plane plane = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}, NULL};
+
+    // Load the plane image (texture)
+    plane.texture = load_image(renderer, "images/image.png");
+
     Enemy enemy = {0, 0, {255, 255, 0, 255}};
     Bullet bullets[100]; // Array to hold up to 100 bullets
     int bulletCount = 0; // Keep track of the number of bullets
@@ -22,7 +28,6 @@ int main(int argc, char *argv[])
     // Main game loop
     int running = 1;
     SDL_Event e;
-
     while (running)
     {
         // Handle events
@@ -47,9 +52,10 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
 
         // Render the plane and enemy
-        renderPlane(renderer, &plane);
-        renderEnemy(renderer, &enemy);
+        SDL_Rect plane_rect = {plane.x, plane.y, 50, 50};
+        SDL_RenderCopy(renderer, plane.texture, NULL, &plane_rect);
 
+        renderEnemy(renderer, &enemy);
         updateBullets(bullets, &bulletCount);
         renderBullets(renderer, bullets, &bulletCount);
         checkCollision(bullets, bulletCount, &enemy);
@@ -62,6 +68,7 @@ int main(int argc, char *argv[])
     }
 
     // Clean up and quit SDL
+    SDL_DestroyTexture(plane.texture); // Free the texture once done
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
