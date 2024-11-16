@@ -1,6 +1,6 @@
 #include "game.h"
 
-void checkCollision(Bullet bullets[], int *bulletCount, Enemy *enemies, int *enemyCount)
+void checkCollision(Bullet bullets[], int *bulletCount, Enemy *enemies, int *enemyCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer)
 {
     for (int i = 0; i < *enemyCount; i++) // Iterate through enemies
     {
@@ -26,6 +26,11 @@ void checkCollision(Bullet bullets[], int *bulletCount, Enemy *enemies, int *ene
                 if (enemies[i].health <= 0)
                 {
                     printf("Enemy %d destroyed!\n", i);
+
+                    // Spawn explosion at enemy's position
+                    loadExplosion(explosionArray, explosionArrayCount, renderer, "images/explosion/HD", 12, enemies[i].x, enemies[i].y);
+
+                    // Remove the enemy by shifting the array
                     for (int k = i; k < *enemyCount - 1; k++)
                     {
                         enemies[k] = enemies[k + 1];

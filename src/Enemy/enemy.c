@@ -17,7 +17,7 @@ void spawnEnemy(Enemy *enemies, int *enemyCount, int maxEnemies, SDL_Renderer *r
         enemies[*enemyCount].x = x;
         enemies[*enemyCount].y = 0;
 
-        enemies[*enemyCount].health = 50;
+        enemies[*enemyCount].health = 10;
         (*enemyCount)++;
     }
 }

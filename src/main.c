@@ -20,10 +20,20 @@ int main(int argc, char *argv[])
     initSDL(&window, &renderer);
 
     // Create a plane object
-    Plane plane = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}, NULL};
+    Plane plane = {SCREEN_WIDTH / 2 - plane.w, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}, NULL};
 
     // Load the plane image (texture)
     plane.texture = loadImage(renderer, "images/image.png", &plane.w, &plane.h);
+
+    SDL_Texture *bg = loadImage(renderer, "images/backgrounds/1.png", NULL, NULL);
+    SDL_Texture *bg_new = loadImage(renderer, "images/backgrounds/2.png", NULL, NULL);
+
+    Uint32 startTime = SDL_GetTicks(); // Record the time when the game starts
+    int transitioning = 0;             // Flag to indicate if a transition is happening
+    int alpha = 0;
+
+    Explosion explosionArray[100];
+    int explosionArrayCount = 0;
 
     Enemy enemies[100];
     int enemyCount = 0;
@@ -62,9 +72,17 @@ int main(int argc, char *argv[])
             spawnEnemy(enemies, &enemyCount, maxEnemies, renderer);
         }
 
-        // Clear the screen (fill with black)
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Set background color (black)
-        SDL_RenderClear(renderer);
+        updateExplosion(explosionArray, &explosionArrayCount, 12);
+
+        /* ===== TRANSITION =====*/
+
+        // Render the background using the new renderBg function
+        // Render the initial background (bg) first
+        renderBg(renderer, bg, bg_new, &transitioning, &startTime, &alpha);
+
+        /* ===== TRANSITION =====*/
+
+        renderExplosion(renderer, explosionArray, &explosionArrayCount);
 
         // Render the plane and enemy
         renderPlane(renderer, &plane);
@@ -75,7 +93,7 @@ int main(int argc, char *argv[])
         updateBullets(bullets, &bulletCount);
         renderBullets(renderer, bullets, &bulletCount);
 
-        checkCollision(bullets, &bulletCount, enemies, &enemyCount);
+        checkCollision(bullets, &bulletCount, enemies, &enemyCount, explosionArray, &explosionArrayCount, renderer);
 
         // Present the rendered frame
         SDL_RenderPresent(renderer);

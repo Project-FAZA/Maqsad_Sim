@@ -5,6 +5,6 @@
 #include "../Enemy/enemy.h"
 #include "../Bullet/bullet.h"
 
-void checkCollision(Bullet bullets[], int *bulletCount, Enemy *enemies, int *enemyCount);
+void checkCollision(Bullet bullets[], int *bulletCount, Enemy *enemies, int *enemyCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer);
 
 #endif
