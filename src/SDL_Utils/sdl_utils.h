@@ -1,8 +1,8 @@
 #ifndef SDL_UTILS_H
 #define SDL_UTILS_H
 // Define the screen width and height
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>

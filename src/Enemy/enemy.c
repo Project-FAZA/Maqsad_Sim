@@ -1,26 +1,57 @@
 #include "enemy.h"
 
-void renderEnemy(SDL_Renderer *renderer, Enemy *enemy)
+void spawnEnemy(Enemy *enemies, int *enemyCount, int maxEnemies, SDL_Renderer *renderer)
 {
-    SDL_SetRenderDrawColor(renderer, enemy->color.r, enemy->color.g, enemy->color.b, enemy->color.a);
-    SDL_Rect body = {enemy->x, enemy->y, 50, 50};
-    SDL_RenderFillRect(renderer, &body);
+    if ((*enemyCount) < maxEnemies)
+    {
+        int x = rand() % (SCREEN_WIDTH - 50); // Random x between 0 and SCREEN_WIDTH - 50
+
+        enemies[*enemyCount].texture = loadImage(renderer, "images/destroyer.png", &enemies[*enemyCount].w, &enemies[*enemyCount].h);
+
+        if (!enemies[*enemyCount].texture)
+        {
+            printf("Failed to load enemy texture\n");
+            return; // Skip this spawn if texture loading fails
+        }
+
+        enemies[*enemyCount].x = x;
+        enemies[*enemyCount].y = 0;
+
+        enemies[*enemyCount].health = 50;
+        (*enemyCount)++;
+    }
 }
 
-void checkCollision(Bullet bullets[], int bulletCount, Enemy *enemy)
+void renderEnemies(SDL_Renderer *renderer, Enemy *enemies, int enemyCount)
 {
-    SDL_Rect body = {enemy->x, enemy->y, 50, 50};
-
-    for (int i = 0; i < bulletCount; i++)
+    for (int i = 0; i < enemyCount; i++)
     {
-        SDL_Rect bulletRect = {bullets[i].x, bullets[i].y, bullets[i].w, bullets[i].h};
+        if (enemies[i].health <= 0)
+            continue; // Skip dead enemies
 
-        if (SDL_HasIntersection(&bulletRect, &body))
+        SDL_Rect body = {enemies[i].x, enemies[i].y, 50, 50};
+        enemies[i].hitbox = body;
+
+        SDL_RenderCopy(renderer, enemies[i].texture, NULL, &(enemies[i].hitbox));
+    }
+}
+
+void updateEnemies(Enemy *enemies, int *enemyCount)
+{
+    for (int i = 0; i < *enemyCount; i++)
+    {
+        enemies[i].y += 3; // Move enemy down by 5 pixels
+
+        // Remove enemies that go off-screen
+        if (enemies[i].y > SCREEN_HEIGHT)
         {
-            enemy->color.r = 255;
-            enemy->color.g = 255;
-            enemy->color.b = 255;
-            enemy->color.a = 255;
+            // Shift the array to remove the enemy
+            for (int j = i; j < (*enemyCount) - 1; j++)
+            {
+                enemies[j] = enemies[j + 1];
+            }
+            (*enemyCount)--;
+            i--; // Adjust index to recheck shifted enemy
         }
     }
 }

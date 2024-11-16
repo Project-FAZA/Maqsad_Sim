@@ -10,9 +10,10 @@ typedef struct
     int x, y;        // Position of the plane
     SDL_Color color; // Color of the plane
     SDL_Texture *texture;
+    SDL_Rect hitbox;
+    int w, h; // Width and Height
 } Plane;
 
-SDL_Texture *load_image(SDL_Renderer *renderer, const char *imagePath);
 void *renderPlane(SDL_Renderer *renderer, Plane *plane);
 void handleInput(Plane *plane);
 

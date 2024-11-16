@@ -44,4 +44,9 @@ void handleInput(Plane *plane)
         plane->x -= 5;
     if (keystates[SDL_SCANCODE_RIGHT])
         plane->x += 5;
+
+    if (plane->x > SCREEN_WIDTH)
+        plane->x = 0 - plane->w;
+    else if (plane->x < 0 - plane->w)
+        plane->x = SCREEN_WIDTH;
 }

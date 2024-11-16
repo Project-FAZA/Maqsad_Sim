@@ -1,13 +1,17 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
+#include <time.h>
 #include "SDL_Utils/sdl_utils.h"
 #include "Plane/plane.h"
 #include "Bullet/bullet.h"
 #include "Enemy/enemy.h"
+#include "Game/game.h"
+#include "Interface/interface.h"
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
     SDL_Texture *tex = NULL;
@@ -19,9 +23,12 @@ int main(int argc, char *argv[])
     Plane plane = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}, NULL};
 
     // Load the plane image (texture)
-    plane.texture = load_image(renderer, "images/image.png");
+    plane.texture = loadImage(renderer, "images/image.png", &plane.w, &plane.h);
 
-    Enemy enemy = {0, 0, {255, 255, 0, 255}};
+    Enemy enemies[100];
+    int enemyCount = 0;
+    const int maxEnemies = 100;
+
     Bullet bullets[100]; // Array to hold up to 100 bullets
     int bulletCount = 0; // Keep track of the number of bullets
 
@@ -47,18 +54,28 @@ int main(int argc, char *argv[])
         // Handle plane movement input
         handleInput(&plane);
 
+        static int frameCount = 0;
+        frameCount++;
+
+        if (frameCount % 120 == 0) // Spawn an enemy every 2 seconds (assuming 60 FPS)
+        {
+            spawnEnemy(enemies, &enemyCount, maxEnemies, renderer);
+        }
+
         // Clear the screen (fill with black)
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Set background color (black)
         SDL_RenderClear(renderer);
 
         // Render the plane and enemy
-        SDL_Rect plane_rect = {plane.x, plane.y, 50, 50};
-        SDL_RenderCopy(renderer, plane.texture, NULL, &plane_rect);
+        renderPlane(renderer, &plane);
 
-        renderEnemy(renderer, &enemy);
+        updateEnemies(enemies, &enemyCount);
+        renderEnemies(renderer, enemies, enemyCount);
+
         updateBullets(bullets, &bulletCount);
         renderBullets(renderer, bullets, &bulletCount);
-        checkCollision(bullets, bulletCount, &enemy);
+
+        checkCollision(bullets, &bulletCount, enemies, &enemyCount);
 
         // Present the rendered frame
         SDL_RenderPresent(renderer);
