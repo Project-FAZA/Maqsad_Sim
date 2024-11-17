@@ -113,39 +113,63 @@ void transitionBackground(SDL_Renderer *renderer, SDL_Texture *background1, SDL_
     SDL_RenderCopy(renderer, background2, NULL, NULL);
 }
 
-void renderBg(SDL_Renderer *renderer, SDL_Texture *bg, SDL_Texture *bg_new, int *transitioning, Uint32 *startTime, int *alpha)
+void renderBg(SDL_Renderer *renderer, SDL_Texture *bg)
 {
-    // If no transition is happening yet, render the initial background (bg)
-    if (!(*transitioning))
+    SDL_RenderCopy(renderer, bg, NULL, &((SDL_Rect){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}));
+}
+
+void renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y, SDL_Color color)
+{
+    if (SDL_strlen(text) == 0)
+        return;
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, color);
+    if (!textSurface)
     {
-        SDL_RenderCopy(renderer, bg, NULL, &((SDL_Rect){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}));
+        printf("Failed to create text surface! TTF_Error: %s\n", TTF_GetError());
+        return;
     }
 
-    // If 5 seconds have passed, start the background transition
-    if (SDL_GetTicks() - *startTime >= 5000 && !(*transitioning))
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    if (!textTexture)
     {
-        *transitioning = 1;          // Start the transition
-        *startTime = SDL_GetTicks(); // Reset the timer after starting the transition
+        printf("Failed to create text texture! SDL_Error: %s\n", SDL_GetError());
+        SDL_FreeSurface(textSurface);
+        return;
     }
 
-    // If transitioning, update the alpha value
-    if (*transitioning)
-    {
-        // Calculate how much time has passed
-        Uint32 elapsedTime = SDL_GetTicks() - *startTime;
+    SDL_Rect textRect = {x, y, textSurface->w, textSurface->h};
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 
-        // If the transition should be happening within the 2-second period
-        if (elapsedTime <= 2000)
-        {
-            // Calculate the alpha value based on the time passed
-            *alpha = (255 * elapsedTime) / 2000; // Gradual transition
-        }
-        else
-        {
-            *alpha = 255; // Fully transition to new background
-        }
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
+}
 
-        // Render the background transition
-        transitionBackground(renderer, bg, bg_new, *alpha);
-    }
+void menuMode(SDL_Renderer *renderer, GameState *gameState)
+{
+    static int toggle = 0;
+    SDL_Color whiteColor = {255, 255, 255, 255};
+    SDL_Color amberColor = {255, 191, 0, 255};
+
+    TTF_Font *mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+    TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+
+    renderText(renderer, mainFont, "MAQSAD", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 200, toggle ? amberColor : whiteColor);
+    toggle = !toggle;
+}
+
+void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], int *charCount)
+{
+    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
+    SDL_Color whiteColor = {255, 255, 255, 255};
+
+    getUsername(username, renderer, charCount);
+
+    TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+
+    renderText(renderer, font, "Enter your name: ", SCREEN_WIDTH / 2 - 400, SCREEN_HEIGHT / 2 - 20, whiteColor);
+    renderText(renderer, font, username, SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2 - 20, whiteColor);
+    renderText(renderer, font, "___", SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2 - 10, whiteColor);
+
+    if (keystates[SDL_SCANCODE_RETURN] && (*charCount == 3))
+        (*gameState) = PLAYING;
 }

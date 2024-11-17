@@ -6,7 +6,7 @@ void *renderPlane(SDL_Renderer *renderer, Plane *plane)
     SDL_SetRenderDrawColor(renderer, plane->color.r, plane->color.g, plane->color.b, plane->color.a);
 
     SDL_Rect body = {plane->x, plane->y, plane->w, plane->h}; // Body is a vertical rectangle
-    SDL_RenderDrawRect(renderer, &body);
+    // SDL_RenderDrawRect(renderer, &body);
 
     // SDL_Rect wings = {plane->x - (75 / 2), plane->y + 40, 100, 20}; // Wings
     // SDL_RenderFillRect(renderer, &wings);

@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <time.h>
 #include "SDL_Utils/sdl_utils.h"
@@ -8,6 +9,53 @@
 #include "Enemy/enemy.h"
 #include "Game/game.h"
 #include "Interface/interface.h"
+
+void playMode(
+    SDL_Renderer *renderer,
+    Plane *plane,
+    Enemy enemies[],
+    int *enemyCount,
+    const int maxEnemies,
+    Explosion explosionArray[],
+    int *explosionArrayCount,
+    SDL_Texture *bg,
+    Bullet bullets[],
+    int *bulletCount)
+{
+    // Handle plane movement input
+    handleInput(plane, bullets, bulletCount);
+
+    static int frameCount = 0;
+    frameCount++;
+
+    if (frameCount % 120 == 0) // Spawn an enemy every 2 seconds (assuming 60 FPS)
+    {
+        spawnEnemy(enemies, enemyCount, maxEnemies, renderer);
+    }
+
+    updateExplosion(explosionArray, explosionArrayCount, 12);
+
+    /* ===== TRANSITION =====*/
+
+    // Render the background using the new renderBg function
+    // Render the initial background (bg) first
+    // renderBg(renderer, bg);
+
+    /* ===== TRANSITION =====*/
+
+    renderExplosion(renderer, explosionArray, explosionArrayCount);
+
+    // Render the plane and enemy
+    renderPlane(renderer, plane);
+
+    updateEnemies(enemies, enemyCount);
+    renderEnemies(renderer, enemies, *enemyCount);
+
+    updateBullets(bullets, bulletCount);
+    renderBullets(renderer, bullets, bulletCount);
+
+    checkCollision(bullets, bulletCount, enemies, enemyCount, explosionArray, explosionArrayCount, renderer);
+}
 
 int main(int argc, char *argv[])
 {
@@ -20,17 +68,14 @@ int main(int argc, char *argv[])
     initSDL(&window, &renderer);
 
     // Create a plane object
-    Plane plane = {SCREEN_WIDTH / 2 - plane.w, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}, NULL};
+    Plane plane = {0, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}, NULL};
 
     // Load the plane image (texture)
-    plane.texture = loadImage(renderer, "images/image.png", &plane.w, &plane.h);
+    plane.texture = loadImage(renderer, "images/plane.png", &plane.w, &plane.h);
 
-    SDL_Texture *bg = loadImage(renderer, "images/backgrounds/1.png", NULL, NULL);
-    SDL_Texture *bg_new = loadImage(renderer, "images/backgrounds/2.png", NULL, NULL);
+    plane.x = SCREEN_WIDTH / 2 - plane.w;
 
-    Uint32 startTime = SDL_GetTicks(); // Record the time when the game starts
-    int transitioning = 0;             // Flag to indicate if a transition is happening
-    int alpha = 0;
+    SDL_Texture *bg = loadImage(renderer, "images/backgrounds/main.jfif", NULL, NULL);
 
     Explosion explosionArray[100];
     int explosionArrayCount = 0;
@@ -42,58 +87,45 @@ int main(int argc, char *argv[])
     Bullet bullets[100]; // Array to hold up to 100 bullets
     int bulletCount = 0; // Keep track of the number of bullets
 
+    char username[4] = {};
+    int charCount = 0;
+
     // Main game loop
-    int running = 1;
+    // 0 -> Menu
+    // 1 -> Playing
+    // 2 -> Highscore
+    // 3 -> Quit
+    GameState gameState = MENU;
     SDL_Event e;
-    while (running)
+    while (gameState != 3)
     {
         // Handle events
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT)
             {
-                running = 0;
-            }
-
-            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
-            {
-                shootBullet(&plane, bullets, &bulletCount);
+                gameState = 3;
             }
         }
 
-        // Handle plane movement input
-        handleInput(&plane);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
 
-        static int frameCount = 0;
-        frameCount++;
-
-        if (frameCount % 120 == 0) // Spawn an enemy every 2 seconds (assuming 60 FPS)
-        {
-            spawnEnemy(enemies, &enemyCount, maxEnemies, renderer);
-        }
-
-        updateExplosion(explosionArray, &explosionArrayCount, 12);
-
-        /* ===== TRANSITION =====*/
-
-        // Render the background using the new renderBg function
-        // Render the initial background (bg) first
-        renderBg(renderer, bg, bg_new, &transitioning, &startTime, &alpha);
-
-        /* ===== TRANSITION =====*/
-
-        renderExplosion(renderer, explosionArray, &explosionArrayCount);
-
-        // Render the plane and enemy
-        renderPlane(renderer, &plane);
-
-        updateEnemies(enemies, &enemyCount);
-        renderEnemies(renderer, enemies, enemyCount);
-
-        updateBullets(bullets, &bulletCount);
-        renderBullets(renderer, bullets, &bulletCount);
-
-        checkCollision(bullets, &bulletCount, enemies, &enemyCount, explosionArray, &explosionArrayCount, renderer);
+        if (gameState == MENU)
+            menuMode(renderer, &gameState);
+        else if (gameState == NAME)
+            nameMode(renderer, &gameState, username, &charCount);
+        else if (gameState == PLAYING)
+            playMode(renderer,
+                     &plane,
+                     enemies,
+                     &enemyCount,
+                     maxEnemies,
+                     explosionArray,
+                     &explosionArrayCount,
+                     bg,
+                     bullets,
+                     &bulletCount);
 
         // Present the rendered frame
         SDL_RenderPresent(renderer);

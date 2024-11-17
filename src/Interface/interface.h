@@ -3,8 +3,10 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include "../SDL_Utils/sdl_utils.h"
+#include "../Game/gameState.h"
 
 typedef struct
 {
@@ -19,6 +21,9 @@ void loadExplosion(Explosion *explosionArray, int *explosionArrayCount, SDL_Rend
 void updateExplosion(Explosion *explosionArray, int *explosionArrayCount, int totalFrames);
 void renderExplosion(SDL_Renderer *renderer, Explosion *explosionArray, int *explosionArrayCount);
 void transitionBackground(SDL_Renderer *renderer, SDL_Texture *background1, SDL_Texture *background2, int alpha);
-void renderBg(SDL_Renderer *renderer, SDL_Texture *bg, SDL_Texture *bg_new, int *transitioning, Uint32 *startTime, int *alpha);
+void renderBg(SDL_Renderer *renderer, SDL_Texture *bg);
+void renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y, SDL_Color color);
+void menuMode(SDL_Renderer *renderer, GameState *gameState);
+void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], int *charCount);
 
 #endif

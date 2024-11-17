@@ -15,6 +15,5 @@ typedef struct
 } Plane;
 
 void *renderPlane(SDL_Renderer *renderer, Plane *plane);
-void handleInput(Plane *plane);
 
 #endif // PLANE_H
