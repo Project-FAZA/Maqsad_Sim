@@ -10,7 +10,7 @@
 #include "Game/game.h"
 #include "Interface/interface.h"
 
-void playMode(
+void playModeStage(
     SDL_Renderer *renderer,
     Plane *plane,
     Enemy enemies[],
@@ -20,7 +20,8 @@ void playMode(
     int *explosionArrayCount,
     SDL_Texture *bg,
     Bullet bullets[],
-    int *bulletCount)
+    int *bulletCount,
+    int *score)
 {
     // Handle plane movement input
     handleInput(plane, bullets, bulletCount);
@@ -28,7 +29,7 @@ void playMode(
     static int frameCount = 0;
     frameCount++;
 
-    if (frameCount % 120 == 0) // Spawn an enemy every 2 seconds (assuming 60 FPS)
+    if (frameCount % (90) == 0) // Spawn an enemy every 2 seconds (assuming 60 FPS)
     {
         spawnEnemy(enemies, enemyCount, maxEnemies, renderer);
     }
@@ -54,7 +55,7 @@ void playMode(
     updateBullets(bullets, bulletCount);
     renderBullets(renderer, bullets, bulletCount);
 
-    checkCollision(bullets, bulletCount, enemies, enemyCount, explosionArray, explosionArrayCount, renderer);
+    checkCollision(bullets, bulletCount, enemies, enemyCount, explosionArray, explosionArrayCount, renderer, score);
 }
 
 int main(int argc, char *argv[])
@@ -89,15 +90,13 @@ int main(int argc, char *argv[])
 
     char username[4] = {};
     int charCount = 0;
+    int score = 0;
 
     // Main game loop
-    // 0 -> Menu
-    // 1 -> Playing
-    // 2 -> Highscore
-    // 3 -> Quit
     GameState gameState = MENU;
     SDL_Event e;
-    while (gameState != 3)
+
+    while (gameState != QUIT)
     {
         // Handle events
         while (SDL_PollEvent(&e) != 0)
@@ -116,16 +115,19 @@ int main(int argc, char *argv[])
         else if (gameState == NAME)
             nameMode(renderer, &gameState, username, &charCount);
         else if (gameState == PLAYING)
-            playMode(renderer,
-                     &plane,
-                     enemies,
-                     &enemyCount,
-                     maxEnemies,
-                     explosionArray,
-                     &explosionArrayCount,
-                     bg,
-                     bullets,
-                     &bulletCount);
+        {
+            playModeStage(renderer,
+                          &plane,
+                          enemies,
+                          &enemyCount,
+                          maxEnemies,
+                          explosionArray,
+                          &explosionArrayCount,
+                          bg,
+                          bullets,
+                          &bulletCount, &score);
+            playMode(renderer, score, username);
+        }
 
         // Present the rendered frame
         SDL_RenderPresent(renderer);

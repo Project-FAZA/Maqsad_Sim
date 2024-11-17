@@ -40,7 +40,7 @@ void updateEnemies(Enemy *enemies, int *enemyCount)
 {
     for (int i = 0; i < *enemyCount; i++)
     {
-        enemies[i].y += 3; // Move enemy down by 5 pixels
+        enemies[i].y += 2; // Move enemy down by 2 pixels
 
         // Remove enemies that go off-screen
         if (enemies[i].y > SCREEN_HEIGHT)

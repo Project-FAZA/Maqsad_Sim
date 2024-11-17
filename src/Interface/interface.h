@@ -25,5 +25,6 @@ void renderBg(SDL_Renderer *renderer, SDL_Texture *bg);
 void renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y, SDL_Color color);
 void menuMode(SDL_Renderer *renderer, GameState *gameState);
 void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], int *charCount);
+void playMode(SDL_Renderer *renderer, int score, char username[4]);
 
 #endif

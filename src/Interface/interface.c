@@ -146,7 +146,12 @@ void renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x,
 
 void menuMode(SDL_Renderer *renderer, GameState *gameState)
 {
+    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     static int toggle = 0;
+
+    char *opts[] = {"PLAY", "CREDITS", "QUIT"};
+    static int selected = 0;
+
     SDL_Color whiteColor = {255, 255, 255, 255};
     SDL_Color amberColor = {255, 191, 0, 255};
 
@@ -155,21 +160,71 @@ void menuMode(SDL_Renderer *renderer, GameState *gameState)
 
     renderText(renderer, mainFont, "MAQSAD", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 200, toggle ? amberColor : whiteColor);
     toggle = !toggle;
+
+    getMenuOpt(renderer, &selected);
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (i == selected)
+        {
+            renderText(renderer, font, ">", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 25 + 65 * i, toggle ? amberColor : whiteColor);
+            renderText(renderer, font, opts[i], SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 25 + 65 * i, toggle ? amberColor : whiteColor);
+        }
+        else
+            renderText(renderer, font, opts[i], SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 25 + 65 * i, whiteColor);
+    }
+
+    if (keystates[SDL_SCANCODE_RETURN])
+    {
+        switch (selected)
+        {
+        case 0:
+            *gameState = NAME;
+            break;
+        case 2:
+            *gameState = QUIT;
+        default:
+            break;
+        }
+    }
 }
 
 void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], int *charCount)
 {
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
+    static int toggle = 0;
     SDL_Color whiteColor = {255, 255, 255, 255};
+    SDL_Color amberColor = {255, 191, 0, 255};
 
     getUsername(username, renderer, charCount);
 
     TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
 
     renderText(renderer, font, "Enter your name: ", SCREEN_WIDTH / 2 - 400, SCREEN_HEIGHT / 2 - 20, whiteColor);
-    renderText(renderer, font, username, SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2 - 20, whiteColor);
+    renderText(renderer, font, username, SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2 - 20, toggle ? amberColor : whiteColor);
     renderText(renderer, font, "___", SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2 - 10, whiteColor);
 
+    toggle = !toggle;
     if (keystates[SDL_SCANCODE_RETURN] && (*charCount == 3))
         (*gameState) = PLAYING;
+}
+
+void playMode(SDL_Renderer *renderer, int score, char username[4])
+{
+    SDL_Color whiteColor = {255, 255, 255, 255};
+    SDL_Color amberColor = {255, 191, 0, 255};
+
+    TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+
+    renderText(renderer, font, username, 10, 10, whiteColor);
+
+    int w, h;
+
+    char str[100] = "0";
+    static int prevScore = 0;
+    sprintf(str, "%d", score);
+
+    TTF_SizeText(font, str, &w, &h);
+    renderText(renderer, font, str, SCREEN_WIDTH - w - 10, 10, (prevScore != score) ? amberColor : whiteColor); // Gives a glowy effect whenever the score changes
+    prevScore = score;
 }

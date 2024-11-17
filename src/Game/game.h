@@ -6,6 +6,6 @@
 #include "../Bullet/bullet.h"
 #include "../Interface/interface.h"
 
-void checkCollision(Bullet bullets[], int *bulletCount, Enemy *enemies, int *enemyCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer);
+void checkCollision(Bullet bullets[], int *bulletCount, Enemy *enemies, int *enemyCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer, int *score);
 
 #endif

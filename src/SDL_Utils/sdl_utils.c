@@ -44,13 +44,13 @@ void handleInput(Plane *plane, Bullet *bullets, int *bulletCount)
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
 
     if (keystates[SDL_SCANCODE_UP])
-        plane->y -= 5;
+        plane->y -= 7;
     if (keystates[SDL_SCANCODE_DOWN])
-        plane->y += 5;
+        plane->y += 7;
     if (keystates[SDL_SCANCODE_LEFT])
-        plane->x -= 5;
+        plane->x -= 7;
     if (keystates[SDL_SCANCODE_RIGHT])
-        plane->x += 5;
+        plane->x += 7;
 
     if (plane->x > SCREEN_WIDTH)
         plane->x = 0 - plane->w;
@@ -141,4 +141,42 @@ void getUsername(char username[4], SDL_Renderer *renderer, int *charCount)
             }
         }
     }
+}
+
+void getMenuOpt(SDL_Renderer *renderer, int *selected)
+{
+    // Get the current state of all keys
+    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
+    static int keyPressed[SDL_NUM_SCANCODES] = {0};
+
+    if (keystates[SDL_SCANCODE_UP])
+    {
+        if (!keyPressed[SDL_SCANCODE_UP])
+        {
+            (*selected)--;
+            keyPressed[SDL_SCANCODE_UP] = 1;
+        }
+    }
+    else
+    {
+        keyPressed[SDL_SCANCODE_UP] = 0;
+    }
+
+    if (keystates[SDL_SCANCODE_DOWN])
+    {
+        if (!keyPressed[SDL_SCANCODE_DOWN])
+        {
+            (*selected)++;
+            keyPressed[SDL_SCANCODE_DOWN] = 1;
+        }
+    }
+    else
+    {
+        keyPressed[SDL_SCANCODE_DOWN] = 0;
+    }
+
+    if ((*selected) > 2)
+        *selected = 0;
+    if ((*selected) < 0)
+        *selected = 2;
 }
