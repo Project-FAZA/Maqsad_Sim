@@ -7,6 +7,7 @@
 #include "../SDL_Utils/sdl_utils.h"
 #include "../Interface/interface.h"
 
+
 typedef struct
 {
     int health;
@@ -16,9 +17,8 @@ typedef struct
     SDL_Rect hitbox;
     int w, h;
 } Enemy;
-
 void spawnEnemy(Enemy *enemies, int *enemyCount, int maxEnemies, SDL_Renderer *renderer);
 void renderEnemies(SDL_Renderer *renderer, Enemy *enemies, int enemyCount);
-void updateEnemies(Enemy *enemies, int *enemyCount);
+void updateEnemies(Enemy *enemies, int *enemyCount, int *score);
 
 #endif // ENEMY_H

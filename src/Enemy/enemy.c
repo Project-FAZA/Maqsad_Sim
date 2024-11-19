@@ -26,8 +26,10 @@ void renderEnemies(SDL_Renderer *renderer, Enemy *enemies, int enemyCount)
 {
     for (int i = 0; i < enemyCount; i++)
     {
-        if (enemies[i].health <= 0)
+        if (enemies[i].health <= 0){
+            
             continue; // Skip dead enemies
+            }
 
         SDL_Rect body = {enemies[i].x, enemies[i].y, 50, 50};
         enemies[i].hitbox = body;
@@ -36,11 +38,14 @@ void renderEnemies(SDL_Renderer *renderer, Enemy *enemies, int enemyCount)
     }
 }
 
-void updateEnemies(Enemy *enemies, int *enemyCount)
+void updateEnemies(Enemy *enemies, int *enemyCount, int *score)
 {
+    int multiplier = 1 + ((*score)/150); //multiplier effect after every 150 points
+
     for (int i = 0; i < *enemyCount; i++)
     {
-        enemies[i].y += 2; // Move enemy down by 2 pixels
+        
+        enemies[i].y += 2 * multiplier ; // Move enemy down by 2 pixels
 
         // Remove enemies that go off-screen
         if (enemies[i].y > SCREEN_HEIGHT)
@@ -52,6 +57,7 @@ void updateEnemies(Enemy *enemies, int *enemyCount)
             }
             (*enemyCount)--;
             i--; // Adjust index to recheck shifted enemy
+            (*score) -= 5;
         }
     }
 }
