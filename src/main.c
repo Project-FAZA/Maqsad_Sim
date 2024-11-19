@@ -49,9 +49,9 @@ void playModeStage(
     // Render the plane and enemy
     renderPlane(renderer, plane);
 
-    updateEnemies(enemies, enemyCount);
+    updateEnemies(enemies, enemyCount, score);
     renderEnemies(renderer, enemies, *enemyCount);
-
+    
     updateBullets(bullets, bulletCount);
     renderBullets(renderer, bullets, bulletCount);
 
