@@ -12,4 +12,13 @@ Aur phir
 ./main
 ```
 
+LEKIN AGAR TUMHAY SIRF GAME KHELNA HAI (parhai warhai toh hoti nahi tum kameenou se) then download these files/folders only
+
+```
+images/
+files/
+*.dll
+main.c
+```
+
 OHKAY Dats AAL. 👍
