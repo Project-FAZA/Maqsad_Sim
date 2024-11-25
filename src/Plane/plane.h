@@ -12,6 +12,7 @@ typedef struct
     SDL_Texture *texture;
     SDL_Rect hitbox;
     int w, h; // Width and Height
+    int health;
 } Plane;
 
 void *renderPlane(SDL_Renderer *renderer, Plane *plane);

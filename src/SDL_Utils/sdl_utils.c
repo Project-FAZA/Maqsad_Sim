@@ -62,40 +62,40 @@ void handleInput(Plane *plane, Bullet *bullets, int *bulletCount)
     else if (plane->y > SCREEN_HEIGHT - plane->h)
         plane->y = SCREEN_HEIGHT - plane->h;
 
-    static int spaceKeyPressed = 0; // Prevent rapid fire without deliberate key press
-    if (keystates[SDL_SCANCODE_SPACE])
+    if (getButtonClick(SDL_SCANCODE_SPACE))
     {
-        if (!spaceKeyPressed)
+        shootBullet(plane, bullets, bulletCount);
+    }
+}
+
+int getButtonClick(Uint8 scancode)
+{
+    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
+    static int keyPressed[SDL_NUM_SCANCODES] = {0};
+
+    if (keystates[scancode])
+    {
+        if (!keyPressed[scancode])
         {
-            shootBullet(plane, bullets, bulletCount);
-            spaceKeyPressed = 1;
+            keyPressed[scancode] = 1;
+            return 1;
         }
     }
     else
     {
-        spaceKeyPressed = 0; // Reset flag when the space bar is released
+        keyPressed[scancode] = 0;
     }
+
+    return 0;
 }
 
 void getUsername(char username[4], SDL_Renderer *renderer, int *charCount)
 {
-    // Get the current state of all keys
-    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
-    static int keyPressed[SDL_NUM_SCANCODES] = {0};
-
     // Handle backspace (if backspace is pressed and there's at least one character)
-    if (keystates[SDL_SCANCODE_BACKSPACE])
+    if (getButtonClick(SDL_SCANCODE_BACKSPACE))
     {
-        if (!keyPressed[SDL_SCANCODE_BACKSPACE] && *charCount > 0)
-        {
-            // Remove the last character
-            username[--(*charCount)] = '\0';
-            keyPressed[SDL_SCANCODE_BACKSPACE] = 1;
-        }
-    }
-    else
-    {
-        keyPressed[SDL_SCANCODE_BACKSPACE] = 0;
+        // Remove the last character
+        username[--(*charCount)] = '\0';
     }
 
     // Handle alphanumeric character input (only A-Z and a-z)
@@ -104,40 +104,27 @@ void getUsername(char username[4], SDL_Renderer *renderer, int *charCount)
         for (char key = 'A'; key <= 'Z'; key++) // Check for letters A-Z
         {
             SDL_Scancode scancode = SDL_GetScancodeFromKey(key);
-            if (keystates[scancode])
+            if (getButtonClick(scancode))
             {
-                if (!keyPressed[scancode])
-                {
-                    // Add the uppercase letter to the username
-                    username[(*charCount)++] = key;
-                    username[*charCount] = '\0'; // Null-terminate the string
-                    keyPressed[scancode] = 1;
-                    break; // Exit the loop once we have processed a key
-                }
-            }
-            else
-            {
-                keyPressed[scancode] = 0;
+
+                // Add the uppercase letter to the username
+                username[(*charCount)++] = key;
+                username[*charCount] = '\0'; // Null-terminate the string
+
+                break; // Exit the loop once we have processed a key
             }
         }
 
         for (char key = 'a'; key <= 'z'; key++) // Check for letters a-z
         {
             SDL_Scancode scancode = SDL_GetScancodeFromKey(key);
-            if (keystates[scancode])
+            if (getButtonClick(scancode))
             {
-                if (!keyPressed[scancode])
-                {
-                    // Add the uppercase letter to the username
-                    username[(*charCount)++] = key - 32;
-                    username[*charCount] = '\0'; // Null-terminate the string
-                    keyPressed[scancode] = 1;
-                    break; // Exit the loop once we have processed a key
-                }
-            }
-            else
-            {
-                keyPressed[scancode] = 0;
+
+                // Add the uppercase letter to the username
+                username[(*charCount)++] = key - 32;
+                username[*charCount] = '\0'; // Null-terminate the string
+                break;                       // Exit the loop once we have processed a key
             }
         }
     }
@@ -145,38 +132,23 @@ void getUsername(char username[4], SDL_Renderer *renderer, int *charCount)
 
 void getMenuOpt(SDL_Renderer *renderer, int *selected)
 {
-    // Get the current state of all keys
-    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
-    static int keyPressed[SDL_NUM_SCANCODES] = {0};
-
-    if (keystates[SDL_SCANCODE_UP])
+    if (getButtonClick(SDL_SCANCODE_UP))
     {
-        if (!keyPressed[SDL_SCANCODE_UP])
-        {
-            (*selected)--;
-            keyPressed[SDL_SCANCODE_UP] = 1;
-        }
-    }
-    else
-    {
-        keyPressed[SDL_SCANCODE_UP] = 0;
+        (*selected)--;
     }
 
-    if (keystates[SDL_SCANCODE_DOWN])
+    if (getButtonClick(SDL_SCANCODE_DOWN))
     {
-        if (!keyPressed[SDL_SCANCODE_DOWN])
-        {
-            (*selected)++;
-            keyPressed[SDL_SCANCODE_DOWN] = 1;
-        }
-    }
-    else
-    {
-        keyPressed[SDL_SCANCODE_DOWN] = 0;
+        (*selected)++;
     }
 
     if ((*selected) > 2)
         *selected = 0;
     if ((*selected) < 0)
         *selected = 2;
+}
+
+int getCreditOpt()
+{
+    return getButtonClick(SDL_SCANCODE_RETURN);
 }

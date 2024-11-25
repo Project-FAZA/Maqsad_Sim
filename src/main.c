@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include "SDL_Utils/sdl_utils.h"
 #include "Plane/plane.h"
@@ -18,10 +19,10 @@ void playModeStage(
     const int maxEnemies,
     Explosion explosionArray[],
     int *explosionArrayCount,
-    SDL_Texture *bg,
     Bullet bullets[],
     int *bulletCount,
-    int *score)
+    int *score,
+    GameState *gameState, char username[4], int *charCount)
 {
     // Handle plane movement input
     handleInput(plane, bullets, bulletCount);
@@ -36,13 +37,18 @@ void playModeStage(
 
     updateExplosion(explosionArray, explosionArrayCount, 12);
 
-    /* ===== TRANSITION =====*/
-
-    // Render the background using the new renderBg function
-    // Render the initial background (bg) first
-    // renderBg(renderer, bg);
-
-    /* ===== TRANSITION =====*/
+    if ((*score < 0) || (plane->health <= 0))
+    {
+        (*gameState) = GAMEOVER;
+        clearContents(plane,
+                      enemies,
+                      enemyCount,
+                      maxEnemies,
+                      explosionArray,
+                      explosionArrayCount,
+                      bullets,
+                      bulletCount, score, gameState, username, charCount);
+    }
 
     renderExplosion(renderer, explosionArray, explosionArrayCount);
 
@@ -51,11 +57,11 @@ void playModeStage(
 
     updateEnemies(enemies, enemyCount, score);
     renderEnemies(renderer, enemies, *enemyCount);
-    
+
     updateBullets(bullets, bulletCount);
     renderBullets(renderer, bullets, bulletCount);
 
-    checkCollision(bullets, bulletCount, enemies, enemyCount, explosionArray, explosionArrayCount, renderer, score);
+    checkCollision(bullets, bulletCount, plane, enemies, enemyCount, explosionArray, explosionArrayCount, renderer, score);
 }
 
 int main(int argc, char *argv[])
@@ -69,14 +75,15 @@ int main(int argc, char *argv[])
     initSDL(&window, &renderer);
 
     // Create a plane object
-    Plane plane = {0, SCREEN_HEIGHT / 2 - 10, {255, 0, 0, 255}, NULL};
+    Plane plane =
+        {.y = SCREEN_HEIGHT / 2 - 10,
+         .color = {255, 0, 0, 255},
+         .health = 10};
 
     // Load the plane image (texture)
     plane.texture = loadImage(renderer, "images/plane.png", &plane.w, &plane.h);
 
     plane.x = SCREEN_WIDTH / 2 - plane.w;
-
-    SDL_Texture *bg = loadImage(renderer, "images/backgrounds/main.jfif", NULL, NULL);
 
     Explosion explosionArray[100];
     int explosionArrayCount = 0;
@@ -88,7 +95,7 @@ int main(int argc, char *argv[])
     Bullet bullets[100]; // Array to hold up to 100 bullets
     int bulletCount = 0; // Keep track of the number of bullets
 
-    char username[4] = {};
+    char username[4] = "";
     int charCount = 0;
     int score = 0;
 
@@ -123,10 +130,17 @@ int main(int argc, char *argv[])
                           maxEnemies,
                           explosionArray,
                           &explosionArrayCount,
-                          bg,
                           bullets,
-                          &bulletCount, &score);
-            playMode(renderer, score, username);
+                          &bulletCount, &score, &gameState, username, &charCount);
+            playMode(renderer, score, username, plane.health);
+        }
+        else if (gameState == CREDITS)
+        {
+            creditsMode(renderer, &gameState);
+        }
+        else if (gameState == GAMEOVER)
+        {
+            gameOverMode(renderer, score, &gameState);
         }
 
         // Present the rendered frame

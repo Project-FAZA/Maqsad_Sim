@@ -13,7 +13,9 @@
 
 void initSDL(SDL_Window **window, SDL_Renderer **renderer);
 void handleInput(Plane *plane, Bullet *bullets, int *bulletCount);
+int getButtonClick(Uint8 scancode);
 void getUsername(char username[4], SDL_Renderer *renderer, int *charCount);
 void getMenuOpt(SDL_Renderer *renderer, int *selected);
+int getCreditOpt();
 
 #endif // SDL_UTILS_H

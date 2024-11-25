@@ -144,6 +144,17 @@ void renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x,
     SDL_DestroyTexture(textTexture);
 }
 
+void getCentreOfText(TTF_Font *font, char *text, int *x, int *y)
+{
+    int w, h;
+    TTF_SizeText(font, text, &w, &h);
+
+    if (x != NULL)
+        (*x) = (SCREEN_WIDTH - w) / 2;
+    if (y != NULL)
+        (*y) = (SCREEN_HEIGHT - h) / 2;
+}
+
 void menuMode(SDL_Renderer *renderer, GameState *gameState)
 {
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
@@ -158,7 +169,10 @@ void menuMode(SDL_Renderer *renderer, GameState *gameState)
     TTF_Font *mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
     TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
 
-    renderText(renderer, mainFont, "MAQSAD", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 200, toggle ? amberColor : whiteColor);
+    int mx, my;
+    getCentreOfText(mainFont, "MAQSAD", &mx, &my);
+
+    renderText(renderer, mainFont, "MAQSAD", mx, my - 150, toggle ? amberColor : whiteColor);
     toggle = !toggle;
 
     getMenuOpt(renderer, &selected);
@@ -174,12 +188,15 @@ void menuMode(SDL_Renderer *renderer, GameState *gameState)
             renderText(renderer, font, opts[i], SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 25 + 65 * i, whiteColor);
     }
 
-    if (keystates[SDL_SCANCODE_RETURN])
+    if (getButtonClick(SDL_SCANCODE_RETURN))
     {
         switch (selected)
         {
         case 0:
             *gameState = NAME;
+            break;
+        case 1:
+            *gameState = CREDITS;
             break;
         case 2:
             *gameState = QUIT;
@@ -209,7 +226,7 @@ void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], in
         (*gameState) = PLAYING;
 }
 
-void playMode(SDL_Renderer *renderer, int score, char username[4])
+void playMode(SDL_Renderer *renderer, int score, char username[4], int health)
 {
     SDL_Color whiteColor = {255, 255, 255, 255};
     SDL_Color amberColor = {255, 191, 0, 255};
@@ -226,5 +243,123 @@ void playMode(SDL_Renderer *renderer, int score, char username[4])
 
     TTF_SizeText(font, str, &w, &h);
     renderText(renderer, font, str, SCREEN_WIDTH - w - 10, 10, (prevScore != score) ? amberColor : whiteColor); // Gives a glowy effect whenever the score changes
+
+    sprintf(str, "%d", health);
+
+    TTF_SizeText(font, str, &w, &h);
+    renderText(renderer, font, str, SCREEN_WIDTH - w - 10, 40, whiteColor);
     prevScore = score;
+}
+
+void creditsMode(SDL_Renderer *renderer, GameState *gameState)
+{
+    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
+
+    SDL_Color whiteColor = {255, 255, 255, 255};
+    SDL_Color amberColor = {255, 191, 0, 255};
+
+    static int toggle = 0;
+    static int j = 0;
+
+    TTF_Font *mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+    TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+
+    char names[][50] = {"Fadil Faisal", "Ahmed Rashdi", "Zain-ul-Abideen ", "Ahmed Raza"};
+    char rollNums[][50] = {"24K-0635", "24K-0709", "24K-0818", "24K-1010"};
+
+    int y1 = SCREEN_HEIGHT / 2 - 200;
+    int mx;
+    getCentreOfText(mainFont, "CREDITS", &mx, NULL);
+    renderText(renderer, mainFont, "CREDITS", mx, y1 - j, toggle ? amberColor : whiteColor);
+    for (int i = 0; i < 4; i++)
+    {
+        int y = SCREEN_HEIGHT / 2 - 25 + 65 * i;
+        renderText(renderer, font, names[i], SCREEN_WIDTH / 2 - 500, y - j, whiteColor);
+        renderText(renderer, font, rollNums[i], SCREEN_WIDTH - 500, y - j, whiteColor);
+    }
+
+    renderText(renderer, font, "MENU", 100, SCREEN_HEIGHT - 50, toggle ? amberColor : whiteColor);
+
+    renderText(renderer, font, ">", 50, SCREEN_HEIGHT - 50, toggle ? amberColor : whiteColor);
+
+    toggle = !toggle;
+    j += 2;
+
+    if (getCreditOpt())
+    {
+        (*gameState) = MENU;
+        j = 0;
+    }
+}
+
+void gameOverAnim(SDL_Renderer *renderer, int score, int reset)
+{
+    static int g = 255, b = 255;
+    static int t = 0;
+    static int y = SCREEN_HEIGHT;
+
+    if (reset)
+    {
+        g = 0;
+        t = 0;
+        y = SCREEN_HEIGHT;
+    }
+
+    SDL_Color color = {255, g, b, 255};
+    TTF_Font *font = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+    char *msg = "Game Over";
+
+    int mx, my;
+    getCentreOfText(font, msg, &mx, &my);
+    renderText(renderer, font, msg, mx, my - 50, color);
+
+    SDL_Color tipColor = {144, 238, 144, t};
+
+    TTF_Font *tipFont = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 20);
+    char *tip = "KILL YOURSELF!";
+    getCentreOfText(tipFont, tip, &mx, NULL);
+
+    // Define target and transition settings
+    int targetY = SCREEN_HEIGHT - 100;
+    int yRate = 3;                                            // Pixels per frame
+    int transitionFrames = (SCREEN_HEIGHT - targetY) / yRate; // Frames to complete y transition
+    int tAndRedRate = 255 / transitionFrames;                 // Transparency increment per frame
+
+    renderText(renderer, tipFont, tip, mx, y, tipColor);
+
+    g -= tAndRedRate;
+    b -= tAndRedRate;
+
+    if (g < 0)
+        g = 0;
+    if (b < 0)
+        b = 0;
+
+    // Update `y`
+    y -= yRate;
+    if (y < targetY)
+        y = targetY;
+
+    // Update `t`
+    t += tAndRedRate;
+    if (t > 255)
+        t = 255;
+}
+
+void gameOverMode(SDL_Renderer *renderer, int score, GameState *gameState)
+{
+    SDL_Color whiteColor = {255, 255, 255, 255};
+    TTF_Font *mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+
+    // int mx, my;
+    // getCentreOfText(mainFont, "Lmao skill issue", &mx, &my);
+
+    // renderText(renderer, mainFont, "Lmao skill issue", mx, my, whiteColor);
+    gameOverAnim(renderer, score, 0);
+
+    if (getButtonClick(SDL_SCANCODE_RETURN))
+    {
+        gameOverAnim(renderer, score, 1);
+        (*gameState) = MENU;
+    }
 }

@@ -6,7 +6,9 @@ typedef enum
     MENU,
     NAME,
     PLAYING,
-    QUIT
+    QUIT,
+    CREDITS,
+    GAMEOVER
 } GameState;
 
 #endif

@@ -5,6 +5,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
+#include <string.h>
 #include "../SDL_Utils/sdl_utils.h"
 #include "../Game/gameState.h"
 
@@ -23,8 +24,11 @@ void renderExplosion(SDL_Renderer *renderer, Explosion *explosionArray, int *exp
 void transitionBackground(SDL_Renderer *renderer, SDL_Texture *background1, SDL_Texture *background2, int alpha);
 void renderBg(SDL_Renderer *renderer, SDL_Texture *bg);
 void renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y, SDL_Color color);
+void getCentreOfText(TTF_Font *font, char *text, int *x, int *y);
 void menuMode(SDL_Renderer *renderer, GameState *gameState);
 void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], int *charCount);
-void playMode(SDL_Renderer *renderer, int score, char username[4]);
+void playMode(SDL_Renderer *renderer, int score, char username[4], int health);
+void creditsMode(SDL_Renderer *renderer, GameState *gameState);
+void gameOverMode(SDL_Renderer *renderer, int score, GameState *gameState);
 
 #endif
