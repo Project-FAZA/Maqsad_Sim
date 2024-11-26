@@ -2,11 +2,17 @@
 
 void spawnEnemy(Enemy *enemies, int *enemyCount, int maxEnemies, SDL_Renderer *renderer)
 {
+    // Load the texture once and reuse it
+    static SDL_Texture *texture = NULL;
+    if (texture == NULL)
+    {
+        texture = loadImage(renderer, "images/destroyer.png", &enemies[*enemyCount].w, &enemies[*enemyCount].h);
+    }
     if ((*enemyCount) < maxEnemies)
     {
         int x = rand() % (SCREEN_WIDTH - 50); // Random x between 0 and SCREEN_WIDTH - 50
 
-        enemies[*enemyCount].texture = loadImage(renderer, "images/destroyer.png", &enemies[*enemyCount].w, &enemies[*enemyCount].h);
+        enemies[*enemyCount].texture = texture;
 
         if (!enemies[*enemyCount].texture)
         {

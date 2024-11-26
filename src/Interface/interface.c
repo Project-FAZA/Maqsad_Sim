@@ -166,8 +166,17 @@ void menuMode(SDL_Renderer *renderer, GameState *gameState)
     SDL_Color whiteColor = {255, 255, 255, 255};
     SDL_Color amberColor = {255, 191, 0, 255};
 
-    TTF_Font *mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
-    TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    static TTF_Font *mainFont = NULL;
+    static TTF_Font *font = NULL;
+
+    if (!mainFont)
+    {
+        mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+    }
+    if (!font)
+    {
+        font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    }
 
     int mx, my;
     getCentreOfText(mainFont, "MAQSAD", &mx, &my);
@@ -215,7 +224,11 @@ void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], in
 
     getUsername(username, renderer, charCount);
 
-    TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    static TTF_Font *font = NULL;
+    if (!font)
+    {
+        font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    }
 
     renderText(renderer, font, "Enter your name: ", SCREEN_WIDTH / 2 - 400, SCREEN_HEIGHT / 2 - 20, whiteColor);
     renderText(renderer, font, username, SCREEN_WIDTH / 2 + 100, SCREEN_HEIGHT / 2 - 20, toggle ? amberColor : whiteColor);
@@ -231,7 +244,11 @@ void playMode(SDL_Renderer *renderer, int score, char username[4], int health)
     SDL_Color whiteColor = {255, 255, 255, 255};
     SDL_Color amberColor = {255, 191, 0, 255};
 
-    TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    static TTF_Font *font = NULL;
+    if (!font)
+    {
+        font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    }
 
     renderText(renderer, font, username, 10, 10, whiteColor);
 
@@ -261,8 +278,17 @@ void creditsMode(SDL_Renderer *renderer, GameState *gameState)
     static int toggle = 0;
     static int j = 0;
 
-    TTF_Font *mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
-    TTF_Font *font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    static TTF_Font *mainFont = NULL;
+    static TTF_Font *font = NULL;
+
+    if (!mainFont)
+    {
+        mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+    }
+    if (!font)
+    {
+        font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    }
 
     char names[][50] = {"Fadil Faisal", "Ahmed Rashdi", "Zain-ul-Abideen ", "Ahmed Raza"};
     char rollNums[][50] = {"24K-0635", "24K-0709", "24K-0818", "24K-1010"};
@@ -306,7 +332,13 @@ void gameOverAnim(SDL_Renderer *renderer, int score, int reset)
     }
 
     SDL_Color color = {255, g, b, 255};
-    TTF_Font *font = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+
+    static TTF_Font *font = NULL;
+    if (!font)
+    {
+        font = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+    }
+
     char *msg = "Game Over";
 
     int mx, my;
@@ -315,7 +347,11 @@ void gameOverAnim(SDL_Renderer *renderer, int score, int reset)
 
     SDL_Color tipColor = {144, 238, 144, t};
 
-    TTF_Font *tipFont = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 20);
+    static TTF_Font *tipFont = NULL;
+    if (!tipFont)
+    {
+        tipFont = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 20);
+    }
     char *tip = "KILL YOURSELF!";
     getCentreOfText(tipFont, tip, &mx, NULL);
 
@@ -348,13 +384,6 @@ void gameOverAnim(SDL_Renderer *renderer, int score, int reset)
 
 void gameOverMode(SDL_Renderer *renderer, int score, GameState *gameState)
 {
-    SDL_Color whiteColor = {255, 255, 255, 255};
-    TTF_Font *mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
-
-    // int mx, my;
-    // getCentreOfText(mainFont, "Lmao skill issue", &mx, &my);
-
-    // renderText(renderer, mainFont, "Lmao skill issue", mx, my, whiteColor);
     gameOverAnim(renderer, score, 0);
 
     if (getButtonClick(SDL_SCANCODE_RETURN))
