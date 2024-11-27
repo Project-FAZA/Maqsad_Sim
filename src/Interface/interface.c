@@ -282,6 +282,7 @@ void creditsMode(SDL_Renderer *renderer, GameState *gameState)
 
     static TTF_Font *mainFont = NULL;
     static TTF_Font *font = NULL;
+    static TTF_Font *creditFont = NULL;
 
     if (!mainFont)
     {
@@ -291,19 +292,48 @@ void creditsMode(SDL_Renderer *renderer, GameState *gameState)
     {
         font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
     }
+    if (!creditFont)
+    {
+        creditFont = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 20);
+    }
 
-    char names[][50] = {"Fadil Faisal", "Ahmed Rashdi", "Zain-ul-Abideen ", "Ahmed Raza"};
+    const char credits[][300] = {
+        "Maqsad Sim was designed, developed,",
+        "and brought to life by our team.",
+        "Inspired by the thrill of aerial combat",
+        "and the challenge of navigating hostile skies,",
+        "this top-down shooter is a labor of creativity",
+        "and passion. Every pixel, line of code,",
+        "and burst of sound was crafted to immerse",
+        "players in high-octane fights and",
+        "adrenaline-pumping action. Special thanks",
+        "to Fadil Faisal, Ahmed Rashdi, Zain-ul Abideen,",
+        "and Ahmed Rashdi for their encouragement and feedback",
+        "throughout development. To all players, thank you for",
+        "taking to the skies - your support fuels the journey.",
+        "Fly high, shoot true, and enjoy the game!"};
+
+    char titles[][100] = {"STRUCTURE AND UI/UX DESIGN", "PHYSICS AND GAMEPLAY MECHANICS", "IMAGE INTEGRATION AND OPTIMIZATION", "AUDIO DESIGN AND MUSIC COMPOSITION"};
+    char names[][50] = {"Fadil Faisal", "Ahmed Rashdi", "Zain-ul-Abideen", "Ahmed Raza"};
     char rollNums[][50] = {"24K-0635", "24K-0709", "24K-0818", "24K-1010"};
 
     int y1 = SCREEN_HEIGHT / 2 - 200;
     int mx;
     getCentreOfText(mainFont, "CREDITS", &mx, NULL);
+
+    for (int i = 0; i < 14; i++)
+    {
+        int y = SCREEN_HEIGHT / 2 - 25 + 50 * i;
+        renderText(renderer, creditFont, credits[i], SCREEN_WIDTH / 2 - 500, y - j, (SDL_Color){179, 235, 242, 255});
+    }
+
     renderText(renderer, mainFont, "CREDITS", mx, y1 - j, toggle ? amberColor : whiteColor);
     for (int i = 0; i < 4; i++)
     {
-        int y = SCREEN_HEIGHT / 2 - 25 + 65 * i;
-        renderText(renderer, font, names[i], SCREEN_WIDTH / 2 - 500, y - j, whiteColor);
-        renderText(renderer, font, rollNums[i], SCREEN_WIDTH - 500, y - j, whiteColor);
+        int y = SCREEN_HEIGHT / 2 - 25 + 200 * i;
+        renderText(renderer, font, titles[i], SCREEN_WIDTH / 2 - 500, y - j + 800, amberColor);
+        renderText(renderer, font, names[i], SCREEN_WIDTH / 2 - 500, y - j + 100 + 800, whiteColor);
+        renderText(renderer, font, rollNums[i], SCREEN_WIDTH - 500, y - j + 100 + 800, whiteColor);
     }
 
     renderText(renderer, font, "MENU", 100, SCREEN_HEIGHT - 50, toggle ? amberColor : whiteColor);
@@ -311,7 +341,8 @@ void creditsMode(SDL_Renderer *renderer, GameState *gameState)
     renderText(renderer, font, ">", 50, SCREEN_HEIGHT - 50, toggle ? amberColor : whiteColor);
 
     toggle = !toggle;
-    j += 2;
+    if (((SCREEN_HEIGHT / 2 - 25 + 200 * 5) - j + 100 + 800) > 0)
+        j += 2;
 
     if (getCreditOpt())
     {
