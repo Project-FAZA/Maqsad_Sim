@@ -62,6 +62,7 @@ void updateBuildings(Building *buildings, int *buildingCount, int *score)
             }
             (*buildingCount)--;
             i--; // Adjust index to recheck shifted building
+            *(score)-=20;
         }
     }
 }
