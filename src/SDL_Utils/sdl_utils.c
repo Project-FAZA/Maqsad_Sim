@@ -37,6 +37,19 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer)
         printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
         exit(1);
     }
+
+    if (SDL_Init(SDL_INIT_AUDIO) != 0)
+    {
+        printf("Error initializing SDL: %s\n", SDL_GetError());
+        exit(1);
+    }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
+    {
+        printf("Error initializing SDL_mixer: %s\n", Mix_GetError());
+        SDL_Quit();
+        exit(1);
+    }
 }
 
 void handleInput(Plane *plane, Bullet *bullets, int *bulletCount)
@@ -91,8 +104,11 @@ int getButtonClick(Uint8 scancode)
 
 void getUsername(char username[4], SDL_Renderer *renderer, int *charCount)
 {
+    printf(TTF_GetError());
+    printf(IMG_GetError());
+    printf(SDL_GetError());
     // Handle backspace (if backspace is pressed and there's at least one character)
-    if (getButtonClick(SDL_SCANCODE_BACKSPACE))
+    if (getButtonClick(SDL_SCANCODE_BACKSPACE) && *charCount > 0)
     {
         // Remove the last character
         username[--(*charCount)] = '\0';
@@ -134,11 +150,13 @@ void getMenuOpt(SDL_Renderer *renderer, int *selected)
 {
     if (getButtonClick(SDL_SCANCODE_UP))
     {
+        playSoundEffect('S');
         (*selected)--;
     }
 
     if (getButtonClick(SDL_SCANCODE_DOWN))
     {
+        playSoundEffect('S');
         (*selected)++;
     }
 

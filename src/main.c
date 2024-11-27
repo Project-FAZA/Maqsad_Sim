@@ -8,6 +8,7 @@
 #include "Plane/plane.h"
 #include "Bullet/bullet.h"
 #include "Enemy/enemy.h"
+#include "Building/building.h"
 #include "Game/game.h"
 #include "Interface/interface.h"
 #include "Leaderboard/leaderboard.h"
@@ -16,8 +17,11 @@ void playModeStage(
     SDL_Renderer *renderer,
     Plane *plane,
     Enemy enemies[],
+    Building buildings[],
     int *enemyCount,
+    int *buildingCount,
     const int maxEnemies,
+    const int maxBuildings,
     Explosion explosionArray[],
     int *explosionArrayCount,
     Bullet bullets[],
@@ -31,10 +35,10 @@ void playModeStage(
     static int frameCount = 0;
     frameCount++;
 
-    if (frameCount % (90) == 0) // Spawn an enemy every 2 seconds (assuming 60 FPS)
-    {
+    if (frameCount % (90) == 0) // Spawn an enemy every 1.5 seconds (assuming 60 FPS)
         spawnEnemy(enemies, enemyCount, maxEnemies, renderer);
-    }
+    if (frameCount % (5 * 60) == 0)
+        spawnBuilding(buildings, buildingCount, maxBuildings, renderer);
 
     updateExplosion(explosionArray, explosionArrayCount, 12);
 
@@ -42,11 +46,18 @@ void playModeStage(
     {
         updateLeaderboard(username, *score);
         displayLeaderboard();
+<<<<<<< Updated upstream
+=======
+        playSoundEffect('L');
+        SDL_Delay(1200);
+        playMusic('G');
+        SDL_Delay(4000);
+>>>>>>> Stashed changes
         (*gameState) = GAMEOVER;
         clearContents(plane,
-                      enemies,
-                      enemyCount,
-                      maxEnemies,
+                      enemies, enemyCount,
+                      buildings, buildingCount,
+                      maxEnemies, maxBuildings,
                       explosionArray,
                       explosionArrayCount,
                       bullets,
@@ -61,10 +72,13 @@ void playModeStage(
     updateEnemies(enemies, enemyCount, score);
     renderEnemies(renderer, enemies, *enemyCount);
 
+    updateBuildings(buildings, buildingCount, score);
+    renderBuildings(renderer, buildings, *buildingCount);
+
     updateBullets(bullets, bulletCount);
     renderBullets(renderer, bullets, bulletCount);
 
-    checkCollision(bullets, bulletCount, plane, enemies, enemyCount, explosionArray, explosionArrayCount, renderer, score);
+    checkCollision(bullets, bulletCount, plane, enemies, enemyCount, buildings, buildingCount, explosionArray, explosionArrayCount, renderer, score);
 }
 
 int main(int argc, char *argv[])
@@ -94,6 +108,10 @@ int main(int argc, char *argv[])
     Enemy enemies[100];
     int enemyCount = 0;
     const int maxEnemies = 100;
+
+    Building buildings[100];
+    int buildingCount = 0;
+    const int maxBuildings = 100;
 
     Bullet bullets[100]; // Array to hold up to 100 bullets
     int bulletCount = 0; // Keep track of the number of bullets
@@ -129,8 +147,11 @@ int main(int argc, char *argv[])
             playModeStage(renderer,
                           &plane,
                           enemies,
+                          buildings,
                           &enemyCount,
+                          &buildingCount,
                           maxEnemies,
+                          maxBuildings,
                           explosionArray,
                           &explosionArrayCount,
                           bullets,
@@ -157,6 +178,7 @@ int main(int argc, char *argv[])
     SDL_DestroyTexture(plane.texture); // Free the texture once done
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    Mix_CloseAudio();
     SDL_Quit();
 
     return 0;

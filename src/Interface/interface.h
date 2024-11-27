@@ -8,6 +8,7 @@
 #include <string.h>
 #include "../SDL_Utils/sdl_utils.h"
 #include "../Game/gameState.h"
+#include "../Music/music.h"
 
 typedef struct
 {

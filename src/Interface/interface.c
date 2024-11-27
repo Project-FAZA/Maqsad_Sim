@@ -199,6 +199,7 @@ void menuMode(SDL_Renderer *renderer, GameState *gameState)
 
     if (getButtonClick(SDL_SCANCODE_RETURN))
     {
+        playSoundEffect('C');
         switch (selected)
         {
         case 0:
@@ -209,6 +210,7 @@ void menuMode(SDL_Renderer *renderer, GameState *gameState)
             break;
         case 2:
             *gameState = QUIT;
+            break;
         default:
             break;
         }
@@ -314,6 +316,7 @@ void creditsMode(SDL_Renderer *renderer, GameState *gameState)
     if (getCreditOpt())
     {
         (*gameState) = MENU;
+        playSoundEffect('C');
         j = 0;
     }
 }
@@ -386,7 +389,7 @@ void gameOverMode(SDL_Renderer *renderer, int score, GameState *gameState)
 {
     gameOverAnim(renderer, score, 0);
 
-    if (getButtonClick(SDL_SCANCODE_RETURN))
+    if (getButtonClick(SDL_SCANCODE_RETURN) && !Mix_PlayingMusic())
     {
         gameOverAnim(renderer, score, 1);
         (*gameState) = MENU;

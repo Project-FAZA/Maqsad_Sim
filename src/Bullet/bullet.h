@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "../Plane/plane.h"
+#include "../Music/music.h"
 
 #define BULLET_SPEED 10
 

@@ -36,6 +36,7 @@ void shootBullet(Plane *plane, Bullet *bullets, int *bulletCount)
 {
     if (*bulletCount < 100) // Limit the number of bullets
     {
+        playSoundEffect('B');
         Bullet newBullet = {plane->x + (plane->w / 2), plane->y - 25, 5, 20, {255, 255, 0, 255}}; // Yellow bullet
         bullets[*bulletCount] = newBullet;
         (*bulletCount)++;
