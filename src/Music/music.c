@@ -2,6 +2,7 @@
 
 void playSoundEffect(char type)
 {
+    Mix_VolumeMusic(128);
     static Mix_Chunk *explosion = NULL;
     static Mix_Chunk *bullet = NULL;
     static Mix_Chunk *menuSwitch = NULL;
@@ -34,11 +35,22 @@ void playSoundEffect(char type)
 
 void playMusic(char type)
 {
+    Mix_VolumeMusic(128);
+    static Mix_Music *battle = NULL;
     static Mix_Music *gameover = NULL;
+
+    if (battle == NULL)
+    {
+        Mix_VolumeMusic(64);
+        battle = Mix_LoadMUS("SoundEffects/Battle.mp3");
+    }
 
     if (gameover == NULL)
         gameover = Mix_LoadMUS("SoundEffects/GameOver.mp3");
 
-    if (type == 'G')
+    if (type == 'B')
+        Mix_PlayMusic(battle, -1);
+
+    else if (type == 'G')
         Mix_PlayMusic(gameover, 1);
 }
