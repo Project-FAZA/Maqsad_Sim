@@ -99,20 +99,6 @@ void renderExplosion(SDL_Renderer *renderer, Explosion *explosionArray, int *exp
     }
 }
 
-void transitionBackground(SDL_Renderer *renderer, SDL_Texture *background1, SDL_Texture *background2, int alpha)
-{
-    SDL_SetTextureBlendMode(background2, SDL_BLENDMODE_BLEND);
-
-    // Render the first (old) background
-    SDL_RenderCopy(renderer, background1, NULL, NULL);
-
-    // Set the alpha value for the second (new) background
-    SDL_SetTextureAlphaMod(background2, alpha);
-
-    // Render the second (new) background with the current alpha
-    SDL_RenderCopy(renderer, background2, NULL, NULL);
-}
-
 void renderBg(SDL_Renderer *renderer, SDL_Texture *bg)
 {
     SDL_RenderCopy(renderer, bg, NULL, &((SDL_Rect){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}));
@@ -358,70 +344,6 @@ void creditsMode(SDL_Renderer *renderer, GameState *gameState)
     }
 }
 
-void gameOverAnim(SDL_Renderer *renderer, Score score, int reset)
-{
-    static int g = 255, b = 255;
-    static int t = 0;
-    static int y = SCREEN_HEIGHT;
-
-    if (reset)
-    {
-        g = 0;
-        t = 0;
-        y = SCREEN_HEIGHT;
-    }
-
-    SDL_Color color = {255, g, b, 255};
-
-    static TTF_Font *font = NULL;
-    if (!font)
-    {
-        font = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
-    }
-
-    char *msg = "Game Over";
-
-    int mx, my;
-    getCentreOfText(font, msg, &mx, &my);
-    renderText(renderer, font, msg, mx, my - 50, color);
-
-    SDL_Color tipColor = {144, 238, 144, t};
-
-    static TTF_Font *tipFont = NULL;
-    if (!tipFont)
-    {
-        tipFont = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 20);
-    }
-    char *tip = "KILL YOURSELF!";
-    getCentreOfText(tipFont, tip, &mx, NULL);
-
-    // Define target and transition settings
-    int targetY = SCREEN_HEIGHT - 100;
-    int yRate = 3;                                            // Pixels per frame
-    int transitionFrames = (SCREEN_HEIGHT - targetY) / yRate; // Frames to complete y transition
-    int tAndRedRate = 255 / transitionFrames;                 // Transparency increment per frame
-
-    renderText(renderer, tipFont, tip, mx, y, tipColor);
-
-    g -= tAndRedRate;
-    b -= tAndRedRate;
-
-    if (g < 0)
-        g = 0;
-    if (b < 0)
-        b = 0;
-
-    // Update `y`
-    y -= yRate;
-    if (y < targetY)
-        y = targetY;
-
-    // Update `t`
-    t += tAndRedRate;
-    if (t > 255)
-        t = 255;
-}
-
 void gameOverMode(SDL_Renderer *renderer, Score score, GameState *gameState)
 {
     static int toggle = 0;
@@ -446,8 +368,6 @@ void gameOverMode(SDL_Renderer *renderer, Score score, GameState *gameState)
     getCentreOfText(mainFont, msg, &mx, NULL);
     renderText(renderer, mainFont, msg, mx, 50, color);
     toggle = !toggle;
-
-    // gameOverAnim(renderer, score, 0);
 
     char scores[][50] = {"BASE:", "ADULTS:", "ELDERS:", "CHILDREN:"};
     int scoreNums[4] = {score.base, score.adults, score.elders, score.children};
