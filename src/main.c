@@ -28,6 +28,8 @@ void playModeStage(
     int *bulletCount,
     GameState *gameState, char username[4], int *charCount)
 {
+    if (!Mix_PlayingMusic())
+        playMusic('B');
     // Handle plane movement input
     handleInput(plane, bullets, bulletCount);
 
@@ -46,6 +48,7 @@ void playModeStage(
         int total = plane->score.base + plane->score.adults + (plane->score.elders * 0.5) + (plane->score.children * 2);
         updateLeaderboard(username, total);
         displayLeaderboard();
+        Mix_HaltMusic();
         playSoundEffect('L');
         SDL_Delay(1200);
         playMusic('G');
