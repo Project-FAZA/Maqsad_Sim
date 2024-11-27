@@ -157,6 +157,9 @@ void getCentreOfText(TTF_Font *font, char *text, int *x, int *y)
 
 void menuMode(SDL_Renderer *renderer, GameState *gameState)
 {
+    if (!Mix_PlayingMusic())
+        playMusic('S');
+
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     static int toggle = 0;
 
@@ -238,7 +241,10 @@ void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], in
 
     toggle = !toggle;
     if (keystates[SDL_SCANCODE_RETURN] && (*charCount == 3))
+    {
         (*gameState) = PLAYING;
+        Mix_HaltMusic();
+    }
 }
 
 void playMode(SDL_Renderer *renderer, int score, char username[4], int health)
