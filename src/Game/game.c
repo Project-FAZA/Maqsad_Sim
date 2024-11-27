@@ -1,9 +1,9 @@
 #include "game.h"
 
-void killEnemy(int *i, Enemy *enemies, int *enemyCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer, int *score)
+void killEnemy(int *i, Enemy *enemies, int *enemyCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer, Score *score)
 {
     printf("Enemy destroyed!\n");
-    (*score) += 10;
+    score->base += 10;
     // Spawn explosion at enemy's position
     loadExplosion(explosionArray, explosionArrayCount, renderer, "images/explosion/HD", 12, enemies[*i].x, enemies[*i].y);
     playSoundEffect('E');
@@ -17,10 +17,15 @@ void killEnemy(int *i, Enemy *enemies, int *enemyCount, Explosion *explosionArra
     (*i)--;          // Adjust index to account for removed enemy
 }
 
-void killBuilding(int *i, Building *buildings, int *buildingCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer, int *score)
+void killBuilding(int *i, Building *buildings, int *buildingCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer, Score *score)
 {
     printf("Building destroyed!\n");
-    (*score) += 20; // Add points for destroying a building (adjust as needed)
+    score->base += 20; // Add points for destroying a building (adjust as needed)
+    score->adults += buildings[*i].adults;
+    score->elders += buildings[*i].elders;
+    score->children += buildings[*i].children;
+
+    printf("\nB: %d A: %d E: %d C: %d\n", score->base, score->adults, score->elders, score->children);
 
     // Spawn explosion at building's position
     loadExplosion(explosionArray, explosionArrayCount, renderer, "images/explosion/HD", 12, buildings[*i].x, buildings[*i].y);
@@ -35,7 +40,7 @@ void killBuilding(int *i, Building *buildings, int *buildingCount, Explosion *ex
     (*i)--;             // Adjust index to account for removed building
 }
 
-void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *enemies, int *enemyCount, Building *buildings, int *buildingCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer, int *score)
+void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *enemies, int *enemyCount, Building *buildings, int *buildingCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer)
 {
     for (int i = 0; i < *enemyCount; i++) // Iterate through enemies
     {
@@ -60,7 +65,7 @@ void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *ene
                 // If enemy is dead, remove it
                 if (enemies[i].health <= 0)
                 {
-                    killEnemy(&i, enemies, enemyCount, explosionArray, explosionArrayCount, renderer, score);
+                    killEnemy(&i, enemies, enemyCount, explosionArray, explosionArrayCount, renderer, &plane->score);
 
                     break; // Exit bullet loop for this enemy
                 }
@@ -68,7 +73,7 @@ void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *ene
         }
         if (SDL_HasIntersection(&enemies[i].hitbox, &(plane->hitbox)))
         {
-            killEnemy(&i, enemies, enemyCount, explosionArray, explosionArrayCount, renderer, score);
+            killEnemy(&i, enemies, enemyCount, explosionArray, explosionArrayCount, renderer, &plane->score);
             plane->health -= 10;
         }
     }
@@ -96,7 +101,7 @@ void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *ene
                 // If enemy is dead, remove it
                 if (buildings[i].health <= 0)
                 {
-                    killBuilding(&i, buildings, buildingCount, explosionArray, explosionArrayCount, renderer, score);
+                    killBuilding(&i, buildings, buildingCount, explosionArray, explosionArrayCount, renderer, &plane->score);
 
                     break; // Exit bullet loop for this building
                 }
@@ -104,7 +109,7 @@ void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *ene
         }
         if (SDL_HasIntersection(&buildings[i].hitbox, &(plane->hitbox)))
         {
-            killBuilding(&i, buildings, buildingCount, explosionArray, explosionArrayCount, renderer, score);
+            killBuilding(&i, buildings, buildingCount, explosionArray, explosionArrayCount, renderer, &plane->score);
             plane->health -= 10;
         }
     }
@@ -119,14 +124,19 @@ void clearContents(Plane *plane,
                    int *explosionArrayCount,
                    Bullet bullets[],
                    int *bulletCount,
-                   int *score,
                    GameState *gameState, char username[4], int *charCount)
 {
     *enemyCount = 0;
     *buildingCount = 0;
     *explosionArrayCount = 0;
     *bulletCount = 0;
-    *score = 0;                             // Reset score if needed
+
+    // Reset score if needed
+    // plane->score.base = 0;
+    // plane->score.adults = 0;
+    // plane->score.elders = 0;
+    // plane->score.children = 0;
+
     plane->health = 10;                     // Reset health to the starting value
     plane->x = SCREEN_WIDTH / 2 - plane->w; // Reset plane position (centered)
     plane->y = SCREEN_HEIGHT / 2 - 10;      // Reset plane's vertical position

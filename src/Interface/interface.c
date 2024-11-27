@@ -321,7 +321,7 @@ void creditsMode(SDL_Renderer *renderer, GameState *gameState)
     }
 }
 
-void gameOverAnim(SDL_Renderer *renderer, int score, int reset)
+void gameOverAnim(SDL_Renderer *renderer, Score score, int reset)
 {
     static int g = 255, b = 255;
     static int t = 0;
@@ -385,13 +385,49 @@ void gameOverAnim(SDL_Renderer *renderer, int score, int reset)
         t = 255;
 }
 
-void gameOverMode(SDL_Renderer *renderer, int score, GameState *gameState)
+void gameOverMode(SDL_Renderer *renderer, Score score, GameState *gameState)
 {
-    gameOverAnim(renderer, score, 0);
+    static int toggle = 0;
+    SDL_Color color = {255, 255 * toggle, 255 * toggle, 255};
+    SDL_Color whiteColor = {255, 255, 255, 255};
+    static TTF_Font *mainFont = NULL;
 
-    if (!Mix_PlayingMusic())
+    if (!mainFont)
     {
-        gameOverAnim(renderer, score, 1);
+        mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+    }
+
+    static TTF_Font *font = NULL;
+    if (!font)
+    {
+        font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    }
+
+    char *msg = "Game Over";
+
+    int mx;
+    getCentreOfText(mainFont, msg, &mx, NULL);
+    renderText(renderer, mainFont, msg, mx, 50, color);
+    toggle = !toggle;
+
+    // gameOverAnim(renderer, score, 0);
+
+    char scores[][50] = {"BASE:", "ADULTS:", "ELDERS:", "CHILDREN:"};
+    int scoreNums[4] = {score.base, score.adults, score.elders, score.children};
+
+    for (int i = 0; i < 4; i++)
+    {
+        int y = SCREEN_HEIGHT / 2 - 25 + 65 * i;
+        renderText(renderer, font, scores[i], SCREEN_WIDTH / 2 - 200, y, whiteColor);
+
+        char numStr[100] = "";
+        sprintf(numStr, "%d", scoreNums[i]);
+        renderText(renderer, font, numStr, SCREEN_WIDTH - 500, y, whiteColor);
+    }
+
+    if (!Mix_PlayingMusic() && getButtonClick(SDL_SCANCODE_RETURN))
+    {
+        // gameOverAnim(renderer, score, 1);
         (*gameState) = LEADERBOARD;
     }
 }

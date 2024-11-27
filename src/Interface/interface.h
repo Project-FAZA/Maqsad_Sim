@@ -31,7 +31,7 @@ void menuMode(SDL_Renderer *renderer, GameState *gameState);
 void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], int *charCount);
 void playMode(SDL_Renderer *renderer, int score, char username[4], int health);
 void creditsMode(SDL_Renderer *renderer, GameState *gameState);
-void gameOverMode(SDL_Renderer *renderer, int score, GameState *gameState);
+void gameOverMode(SDL_Renderer *renderer, Score score, GameState *gameState);
 void leaderboardMode(SDL_Renderer *renderer, GameState *gameState);
 
 #endif

@@ -8,7 +8,7 @@
 #include "../Interface/interface.h"
 #include "../Music/music.h"
 
-void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *enemies, int *enemyCount, Building *buildings, int *buildingsCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer, int *score);
+void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *enemies, int *enemyCount, Building *buildings, int *buildingsCount, Explosion *explosionArray, int *explosionArrayCount, SDL_Renderer *renderer);
 void clearContents(Plane *plane,
                    Enemy enemies[], int *enemyCount,
                    Building buildings[], int *buildingCount,
@@ -18,6 +18,5 @@ void clearContents(Plane *plane,
                    int *explosionArrayCount,
                    Bullet bullets[],
                    int *bulletCount,
-                   int *score,
                    GameState *gameState, char username[4], int *charCount);
 #endif

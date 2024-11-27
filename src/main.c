@@ -26,7 +26,6 @@ void playModeStage(
     int *explosionArrayCount,
     Bullet bullets[],
     int *bulletCount,
-    int *score,
     GameState *gameState, char username[4], int *charCount)
 {
     // Handle plane movement input
@@ -42,9 +41,9 @@ void playModeStage(
 
     updateExplosion(explosionArray, explosionArrayCount, 12);
 
-    if ((*score < 0) || (plane->health <= 0))
+    if ((plane->score.base < 0) || (plane->health <= 0))
     {
-        updateLeaderboard(username, *score);
+        updateLeaderboard(username, plane->score.base);
         displayLeaderboard();
         playSoundEffect('L');
         SDL_Delay(1200);
@@ -58,7 +57,7 @@ void playModeStage(
                       explosionArray,
                       explosionArrayCount,
                       bullets,
-                      bulletCount, score, gameState, username, charCount);
+                      bulletCount, gameState, username, charCount);
     }
 
     renderExplosion(renderer, explosionArray, explosionArrayCount);
@@ -66,16 +65,16 @@ void playModeStage(
     // Render the plane and enemy
     renderPlane(renderer, plane);
 
-    updateEnemies(enemies, enemyCount, score);
+    updateEnemies(enemies, enemyCount, &plane->score.base);
     renderEnemies(renderer, enemies, *enemyCount);
 
-    updateBuildings(buildings, buildingCount, score);
+    updateBuildings(buildings, buildingCount, &plane->score.base);
     renderBuildings(renderer, buildings, *buildingCount);
 
     updateBullets(bullets, bulletCount);
     renderBullets(renderer, bullets, bulletCount);
 
-    checkCollision(bullets, bulletCount, plane, enemies, enemyCount, buildings, buildingCount, explosionArray, explosionArrayCount, renderer, score);
+    checkCollision(bullets, bulletCount, plane, enemies, enemyCount, buildings, buildingCount, explosionArray, explosionArrayCount, renderer);
 }
 
 int main(int argc, char *argv[])
@@ -92,7 +91,8 @@ int main(int argc, char *argv[])
     Plane plane =
         {.y = SCREEN_HEIGHT / 2 - 10,
          .color = {255, 0, 0, 255},
-         .health = 10};
+         .health = 10,
+         .score = {0, 0, 0, 0}};
 
     // Load the plane image (texture)
     plane.texture = loadImage(renderer, "images/plane.png", &plane.w, &plane.h);
@@ -115,13 +115,13 @@ int main(int argc, char *argv[])
 
     char username[4] = "";
     int charCount = 0;
-    int score = 0;
 
     // Main game loop
     GameState gameState = MENU;
     SDL_Event e;
 
     static char nameInLeaderboard[4] = "";
+    static int clear = 0;
     while (gameState != QUIT)
     {
         // Handle events
@@ -137,7 +137,9 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
 
         if (gameState == MENU)
+        {
             menuMode(renderer, &gameState);
+        }
         else if (gameState == NAME)
             nameMode(renderer, &gameState, username, &charCount);
         else if (gameState == PLAYING)
@@ -153,8 +155,8 @@ int main(int argc, char *argv[])
                           explosionArray,
                           &explosionArrayCount,
                           bullets,
-                          &bulletCount, &score, &gameState, username, &charCount);
-            playMode(renderer, score, username, plane.health);
+                          &bulletCount, &gameState, username, &charCount);
+            playMode(renderer, plane.score.base, username, plane.health);
         }
         else if (gameState == CREDITS)
         {
@@ -162,7 +164,14 @@ int main(int argc, char *argv[])
         }
         else if (gameState == GAMEOVER)
         {
-            gameOverMode(renderer, score, &gameState);
+            gameOverMode(renderer, plane.score, &gameState);
+            if (gameState != GAMEOVER)
+            {
+                plane.score.base = 0;
+                plane.score.adults = 0;
+                plane.score.elders = 0;
+                plane.score.children = 0;
+            }
         }
         else if (gameState == LEADERBOARD)
         {

@@ -2,22 +2,64 @@
 
 void spawnBuilding(Building *buildings, int *buildingCount, int maxBuildings, SDL_Renderer *renderer)
 {
-    // Load the texture once and reuse it
-    static SDL_Texture *texture = NULL;
-    if (texture == NULL)
+    // Load the textures once and reuse them
+    static SDL_Texture *textures[3] = {NULL, NULL, NULL};
+    const char *textureFiles[3] = {
+        "images/buildings/1.png",
+        "images/buildings/2.png",
+        "images/buildings/3.png"};
+
+    // Load textures if they are not already loaded
+    for (int i = 0; i < 3; i++)
     {
-        texture = loadImage(renderer, "images/buildings/1.png", &buildings[*buildingCount].w, &buildings[*buildingCount].h);
+        if (textures[i] == NULL)
+        {
+            textures[i] = loadImage(renderer, textureFiles[i], NULL, NULL);
+            if (textures[i] == NULL)
+            {
+                printf("Failed to load building texture %s\n", textureFiles[i]);
+                return;
+            }
+        }
     }
+
     if ((*buildingCount) < maxBuildings)
     {
-        int x = rand() % (SCREEN_WIDTH - 100); // Random x between 0 and SCREEN_WIDTH - building width (100)
+        // Randomly select a texture
+        int i = (rand() % 9);
 
-        buildings[*buildingCount].texture = texture;
+        if (i < 5) // 50% chance
+            i = 2;
+        else if (i < 8) // 30% chance (next 3 values: 5, 6, 7)
+            i = 0;
+        else // 20% chance (last 2 values: 8, 9)
+            i = 1;
+
+        int x = rand() % (SCREEN_WIDTH - 60); // Random x between 0 and SCREEN_WIDTH - building width (50-60)
+
+        buildings[*buildingCount].texture = textures[i];
+
+        if (i == 0) // School
+        {
+            buildings[*buildingCount].adults = 5;
+            buildings[*buildingCount].children = 10;
+        }
+        else if (i == 1) // Orphanage
+        {
+            buildings[*buildingCount].adults = 1;
+            buildings[*buildingCount].children = 15;
+        }
+        else if (i == 2) // Hospital
+        {
+            buildings[*buildingCount].adults = 2;
+            buildings[*buildingCount].children = 2;
+            buildings[*buildingCount].elders = 4;
+        }
 
         if (!buildings[*buildingCount].texture)
         {
-            printf("Failed to load building texture\n");
-            return; // Skip this spawn if texture loading fails
+            printf("Failed to assign building texture\n");
+            return; // Skip this spawn if texture assignment fails
         }
 
         buildings[*buildingCount].x = x;
