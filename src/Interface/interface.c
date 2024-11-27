@@ -308,7 +308,7 @@ void creditsMode(SDL_Renderer *renderer, GameState *gameState)
         "players in high-octane fights and",
         "adrenaline-pumping action. Special thanks",
         "to Fadil Faisal, Ahmed Rashdi, Zain-ul Abideen,",
-        "and Ahmed Rashdi for their encouragement and feedback",
+        "and Ahmed Raza for their encouragement and feedback",
         "throughout development. To all players, thank you for",
         "taking to the skies - your support fuels the journey.",
         "Fly high, shoot true, and enjoy the game!"};
