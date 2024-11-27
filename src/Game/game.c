@@ -103,6 +103,10 @@ void checkCollision(Bullet bullets[], int *bulletCount, Plane *plane, Enemy *ene
                 {
                     killBuilding(&i, buildings, buildingCount, explosionArray, explosionArrayCount, renderer, &plane->score);
 
+                    int r = rand() % 10;
+                    if (r == 0)
+                        plane->health += 10;
+
                     break; // Exit bullet loop for this building
                 }
             }

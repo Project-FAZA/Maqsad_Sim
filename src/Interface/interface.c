@@ -269,10 +269,10 @@ void playMode(SDL_Renderer *renderer, int score, char username[4], int health)
     TTF_SizeText(font, str, &w, &h);
     renderText(renderer, font, str, SCREEN_WIDTH - w - 10, 10, (prevScore != score) ? amberColor : whiteColor); // Gives a glowy effect whenever the score changes
 
-    sprintf(str, "%d", health);
+    sprintf(str, "HP %d", health);
 
     TTF_SizeText(font, str, &w, &h);
-    renderText(renderer, font, str, SCREEN_WIDTH - w - 10, 40, whiteColor);
+    renderText(renderer, font, str, 10, 40, whiteColor);
     prevScore = score;
 }
 
