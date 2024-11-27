@@ -389,9 +389,59 @@ void gameOverMode(SDL_Renderer *renderer, int score, GameState *gameState)
 {
     gameOverAnim(renderer, score, 0);
 
-    if (getButtonClick(SDL_SCANCODE_RETURN) && !Mix_PlayingMusic())
+    if (!Mix_PlayingMusic())
     {
         gameOverAnim(renderer, score, 1);
-        (*gameState) = MENU;
+        (*gameState) = LEADERBOARD;
+    }
+}
+
+void leaderboardMode(SDL_Renderer *renderer, GameState *gameState)
+{
+    int startX = SCREEN_WIDTH / 2 - 350;  // Starting X position for the text
+    int startY = SCREEN_HEIGHT / 2 - 100; // Starting Y position for the text
+    LeaderboardRow leaderboard[10];
+
+    getLeaderboard(leaderboard);
+
+    SDL_Color whiteColor = {255, 255, 255, 255};
+    SDL_Color amberColor = {255, 191, 0, 255};
+
+    static int toggle = 0;
+
+    static TTF_Font *mainFont = NULL;
+    if (!mainFont)
+    {
+        mainFont = TTF_OpenFont("fonts/alpha-taurus-font/Main.ttf", 100);
+    }
+
+    static TTF_Font *font = NULL;
+    if (!font)
+    {
+        font = TTF_OpenFont("fonts/PS2P/PressStart2P-Regular.ttf", 30);
+    }
+
+    int mx;
+    getCentreOfText(mainFont, "LEADERBOARD", &mx, NULL);
+    renderText(renderer, mainFont, "LEADERBOARD", mx, 100, toggle ? amberColor : whiteColor);
+    toggle = !toggle;
+
+    renderText(renderer, font, "> MENU", 100, SCREEN_HEIGHT - 50, toggle ? amberColor : whiteColor);
+
+    for (int i = 0; i < 10; i++)
+    {
+        // Calculate position for the text
+        int x = startX + (i / 5) * 400; // Adjust X for second column
+        int y = startY + (i % 5) * 50;  // Y position based on row
+
+        char text[100] = "";
+        sprintf(text, "%d. %s %d", i, (leaderboard[i].name[0] != '\0') ? leaderboard[i].name : "___", leaderboard[i].score);
+        renderText(renderer, font, text, x, y, whiteColor);
+    }
+
+    if (getButtonClick(SDL_SCANCODE_RETURN))
+    {
+        playSoundEffect('C');
+        *gameState = MENU;
     }
 }

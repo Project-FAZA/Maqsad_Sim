@@ -8,7 +8,8 @@ typedef enum
     PLAYING,
     QUIT,
     CREDITS,
-    GAMEOVER
+    GAMEOVER,
+    LEADERBOARD
 } GameState;
 
 #endif

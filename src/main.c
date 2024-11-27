@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
     GameState gameState = MENU;
     SDL_Event e;
 
+    static char nameInLeaderboard[4] = "";
     while (gameState != QUIT)
     {
         // Handle events
@@ -162,6 +163,10 @@ int main(int argc, char *argv[])
         else if (gameState == GAMEOVER)
         {
             gameOverMode(renderer, score, &gameState);
+        }
+        else if (gameState == LEADERBOARD)
+        {
+            leaderboardMode(renderer, &gameState);
         }
 
         // Present the rendered frame

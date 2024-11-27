@@ -9,6 +9,7 @@
 #include "../SDL_Utils/sdl_utils.h"
 #include "../Game/gameState.h"
 #include "../Music/music.h"
+#include "../Leaderboard/leaderboard.h"
 
 typedef struct
 {
@@ -31,5 +32,6 @@ void nameMode(SDL_Renderer *renderer, GameState *gameState, char username[4], in
 void playMode(SDL_Renderer *renderer, int score, char username[4], int health);
 void creditsMode(SDL_Renderer *renderer, GameState *gameState);
 void gameOverMode(SDL_Renderer *renderer, int score, GameState *gameState);
+void leaderboardMode(SDL_Renderer *renderer, GameState *gameState);
 
 #endif
