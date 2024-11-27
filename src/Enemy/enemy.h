@@ -7,7 +7,6 @@
 #include "../SDL_Utils/sdl_utils.h"
 #include "../Interface/interface.h"
 
-
 typedef struct
 {
     int health;

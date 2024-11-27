@@ -2,7 +2,8 @@
 	"files.associations": {
 		"sdl_image.h": "c",
 		"sdl.h": "c",
-		"stdlib.h": "c"
+		"stdlib.h": "c",
+		"building.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "enabled"
 }

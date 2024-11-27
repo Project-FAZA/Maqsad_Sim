@@ -46,13 +46,10 @@ void playModeStage(
     {
         updateLeaderboard(username, *score);
         displayLeaderboard();
-<<<<<<< Updated upstream
-=======
         playSoundEffect('L');
         SDL_Delay(1200);
         playMusic('G');
         SDL_Delay(4000);
->>>>>>> Stashed changes
         (*gameState) = GAMEOVER;
         clearContents(plane,
                       enemies, enemyCount,
