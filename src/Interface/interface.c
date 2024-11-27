@@ -414,16 +414,26 @@ void gameOverMode(SDL_Renderer *renderer, Score score, GameState *gameState)
 
     char scores[][50] = {"BASE:", "ADULTS:", "ELDERS:", "CHILDREN:"};
     int scoreNums[4] = {score.base, score.adults, score.elders, score.children};
-
+    int total = score.base + score.adults + (score.elders * 0.5) + (score.children * 2);
     for (int i = 0; i < 4; i++)
     {
         int y = SCREEN_HEIGHT / 2 - 25 + 65 * i;
-        renderText(renderer, font, scores[i], SCREEN_WIDTH / 2 - 200, y, whiteColor);
+        renderText(renderer, font, scores[i], SCREEN_WIDTH / 2 - 200 - 75, y, whiteColor);
 
         char numStr[100] = "";
-        sprintf(numStr, "%d", scoreNums[i]);
-        renderText(renderer, font, numStr, SCREEN_WIDTH - 500, y, whiteColor);
+        char numStrBase[4][100] = {"%d", "%d", "%d x 0.5", "%d x 2"};
+
+        sprintf(numStr, numStrBase[i], scoreNums[i]);
+        renderText(renderer, font, numStr, SCREEN_WIDTH - 500 - 75, y, whiteColor);
     }
+    renderText(renderer, font, "____________________", SCREEN_WIDTH / 2 - 200 - 75, SCREEN_HEIGHT / 2 - 25 + 65 * 3 + 20, whiteColor);
+    renderText(renderer, font, "TOTAL: ", SCREEN_WIDTH / 2 - 200 - 75, SCREEN_HEIGHT / 2 - 25 + 65 * 4, whiteColor);
+
+    char totalStr[100] = "";
+
+    sprintf(totalStr, "%d", total);
+
+    renderText(renderer, font, totalStr, SCREEN_WIDTH - 500 - 75, SCREEN_HEIGHT / 2 - 25 + 65 * 4, whiteColor);
 
     if (!Mix_PlayingMusic() && getButtonClick(SDL_SCANCODE_RETURN))
     {

@@ -43,7 +43,8 @@ void playModeStage(
 
     if ((plane->score.base < 0) || (plane->health <= 0))
     {
-        updateLeaderboard(username, plane->score.base);
+        int total = plane->score.base + plane->score.adults + (plane->score.elders * 0.5) + (plane->score.children * 2);
+        updateLeaderboard(username, total);
         displayLeaderboard();
         playSoundEffect('L');
         SDL_Delay(1200);
