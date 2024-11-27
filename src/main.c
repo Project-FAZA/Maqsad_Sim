@@ -10,6 +10,7 @@
 #include "Enemy/enemy.h"
 #include "Game/game.h"
 #include "Interface/interface.h"
+#include "Leaderboard/leaderboard.h"
 
 void playModeStage(
     SDL_Renderer *renderer,
@@ -39,6 +40,8 @@ void playModeStage(
 
     if ((*score < 0) || (plane->health <= 0))
     {
+        updateLeaderboard(username, *score);
+        displayLeaderboard();
         (*gameState) = GAMEOVER;
         clearContents(plane,
                       enemies,
